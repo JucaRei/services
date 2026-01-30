@@ -1,0 +1,50 @@
+Jan 30 17:49:45 unbound[7:0] notice: init module 0: validator
+Jan 30 17:49:45 unbound[7:0] notice: init module 1: cachedb
+Jan 30 17:49:45 unbound[7:0] notice: Redis initialization
+Jan 30 17:49:45 unbound[7:0] error: failed to connect to redis server: Name does not resolve
+Jan 30 17:49:45 unbound[7:0] error: redis_init: failed to init redis (for thread 0)
+Jan 30 17:49:45 unbound[7:0] notice: init module 2: iterator
+Jan 30 17:49:45 unbound[7:0] info: start of service (unbound 1.24.2).
+Jan 30 17:49:50 unbound[7:0] error: failed to connect to redis server: Name does not resolve
+Jan 30 17:49:50 unbound[7:0] error: failed to connect to redis server: Name does not resolve
+Jan 30 17:49:50 unbound[7:0] error: failed to connect to redis server: Name does not resolve
+Jan 30 17:52:09 unbound[7:0] info: service stopped (unbound 1.24.2).
+Jan 30 17:52:09 unbound[7:0] info: server stats for thread 0: 3 queries, 2 answers from cache, 1 recursions, 0 prefetch, 0 rejected by ip ratelimiting
+Jan 30 17:52:09 unbound[7:0] info: server stats for thread 0: requestlist max 0 avg 0 exceeded 0 jostled 0
+Jan 30 17:52:09 unbound[7:0] info: average recursion processing time 0.519933 sec
+Jan 30 17:52:09 unbound[7:0] info: histogram of recursion processing times
+Jan 30 17:52:09 unbound[7:0] info: [25%]=0 median[50%]=0 [75%]=0
+Jan 30 17:52:09 unbound[7:0] info: lower(secs) upper(secs) recursions
+Jan 30 17:52:09 unbound[7:0] info:    0.262144    0.524288 1
+Jan 30 17:52:09 unbound[7:0] notice: Redis deinitialization
+Jan 30 17:53:58 unbound[7:0] notice: init module 0: validator
+Jan 30 17:53:58 unbound[7:0] notice: init module 1: cachedb
+Jan 30 17:53:58 unbound[7:0] notice: Redis initialization
+Jan 30 17:53:58 unbound[7:0] error: failed to connect to redis server: Name does not resolve
+Jan 30 17:53:58 unbound[7:0] error: redis_init: failed to init redis (for thread 0)
+Jan 30 17:53:58 unbound[7:0] notice: init module 2: iterator
+Jan 30 17:53:58 unbound[7:0] info: start of service (unbound 1.24.2).
+Jan 30 17:54:03 unbound[7:0] error: failed to connect to redis server: Name does not resolve
+Jan 30 17:54:03 unbound[7:0] info: generate keytag query _ta-4f66-9728. NULL IN
+Jan 30 17:54:03 unbound[7:0] error: failed to connect to redis server: Name does not resolve
+Jan 30 17:54:03 unbound[7:0] error: failed to connect to redis server: Name does not resolve
+Jan 30 17:54:06 unbound[7:0] info: service stopped (unbound 1.24.2).
+Jan 30 17:54:06 unbound[7:0] info: server stats for thread 0: 1 queries, 0 answers from cache, 1 recursions, 0 prefetch, 0 rejected by ip ratelimiting
+Jan 30 17:54:06 unbound[7:0] info: server stats for thread 0: requestlist max 0 avg 0 exceeded 0 jostled 0
+Jan 30 17:54:06 unbound[7:0] info: average recursion processing time 0.451619 sec
+Jan 30 17:54:06 unbound[7:0] info: histogram of recursion processing times
+Jan 30 17:54:06 unbound[7:0] info: [25%]=0 median[50%]=0 [75%]=0
+Jan 30 17:54:06 unbound[7:0] info: lower(secs) upper(secs) recursions
+Jan 30 17:54:06 unbound[7:0] info:    0.262144    0.524288 1
+Jan 30 17:54:06 unbound[7:0] notice: Redis deinitialization
+Jan 30 17:55:20 unbound[8:0] notice: init module 0: validator
+Jan 30 17:55:20 unbound[8:0] notice: init module 1: cachedb
+Jan 30 17:55:20 unbound[8:0] notice: Redis initialization
+Jan 30 17:55:20 unbound[8:0] error: failed to connect to redis server: Name does not resolve
+Jan 30 17:55:20 unbound[8:0] error: redis_init: failed to init redis (for thread 0)
+Jan 30 17:55:20 unbound[8:0] notice: init module 2: iterator
+Jan 30 17:55:20 unbound[8:0] info: start of service (unbound 1.24.2).
+Jan 30 17:55:25 unbound[8:0] error: failed to connect to redis server: Name does not resolve
+Jan 30 17:55:26 unbound[8:0] error: failed to connect to redis server: Name does not resolve
+Jan 30 17:55:26 unbound[8:0] error: failed to connect to redis server: Name does not resolve
+Jan 30 18:00:28 unbound[8:0] error: failed to connect to redis server: Name does not resolve

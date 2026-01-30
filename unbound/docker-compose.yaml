@@ -7,8 +7,7 @@ services:
     volumes:
       - unbound-db-sock:/run/redis
       - cachedb.d:/usr/local/unbound/cachedb.d/
-    # command: /bin/sh -c "mkdir -p /run/redis && chown 999:1000 /run/redis && chmod 770 /run/redis && sleep infinity"
-    command: /bin/sh -c "chown -R 999:1000 /usr/local/unbound/cachedb.d/"
+    command: /bin/sh -c "mkdir -p /run/redis && chown 999:1000 /run/redis && chmod 770 /run/redis && sleep infinity"
     restart: unless-stopped
 
   unbound-db:
@@ -24,7 +23,7 @@ services:
       - ./data/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
     command: redis-server /usr/local/etc/redis/redis.conf
     restart: unless-stopped
-
+    
   unbound:
     container_name: unbound
     image: madnuttah/unbound:latest
@@ -33,14 +32,14 @@ services:
     volumes_from:
       - unbound-db-socket
     volumes:
-      # - /etc/localtime:/etc/localtime:ro
       - ./data/unbound/unbound.conf:/usr/local/unbound/unbound.conf:rw
       - ./data/unbound/conf.d:/usr/local/unbound/conf.d/:rw
       - ./data/unbound/log.d/unbound.log:/usr/local/unbound/log.d/unbound.log:rw
       - ./data/unbound/log.d/unbound-stats.log:/usr/local/unbound/log.d/unbound-stats.log:rw
       - ./data/unbound/zones.d:/usr/local/unbound/zones.d/:rw
       - ./data/unbound/healthcheck.sh:/usr/local/unbound/sbin/healthcheck.sh:ro
-      - cachedb.d:/usr/local/unbound/cachedb.d/  # Para cache Redis persistente
+      - cachedb.d:/usr/local/unbound/cachedb.d/ # Para cache Redis persistente
+      - unbound-pid:/var/run  # Volume for PID file
     ports:
       - "10.10.10.53:53:53/tcp"
       - "10.10.10.53:53:53/udp"
@@ -48,12 +47,12 @@ services:
       - NET_BIND_SERVICE
     environment:
       TZ: America/Sao_Paulo
-      DISABLE_SET_PERMS: 1 # ou "true" 
-      UNBOUND_UID: 1000
-      UNBOUND_GID: 1000
+      # Remove all user-related environment variables:
+      # DISABLE_SET_PERMS: 1
+      # UNBOUND_UID: 1000
+      # UNBOUND_GID: 1000
       HEALTHCHECK_PORT: 53
       EXTENDED_HEALTHCHECK: true
-      # EXTENDED_HEALTHCHECK_DOMAIN: nlnetlabs.nl
       ENABLE_STATS: true
     healthcheck:
       test: ["CMD-SHELL", "/usr/local/unbound/sbin/healthcheck.sh"]
@@ -67,6 +66,7 @@ volumes:
   unbound-db-sock:
   redis-data:
   cachedb.d:
+  unbound-pid:
 
 # mkdir -pv data/unbound/{conf.d,iana.d,zones.d,log.d}
 # mkdir -pv data/redis
