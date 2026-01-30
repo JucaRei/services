@@ -49,8 +49,8 @@ services:
       TZ: America/Sao_Paulo
       # Remove all user-related environment variables:
       # DISABLE_SET_PERMS: 1
-      # UNBOUND_UID: 1000
-      # UNBOUND_GID: 1000
+      UNBOUND_UID: 1000
+      UNBOUND_GID: 1000
       HEALTHCHECK_PORT: 53
       EXTENDED_HEALTHCHECK: true
       ENABLE_STATS: true
