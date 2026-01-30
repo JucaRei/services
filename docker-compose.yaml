@@ -1,0 +1,66 @@
+services:
+  unbound-db-socket:
+    container_name: unbound-db-socket
+    image: busybox:latest
+    volumes:
+      - unbound-db-sock:/run/redis
+    command: /bin/sh -c "mkdir -p /run/redis && chown 999:1000 /run/redis && chmod 770 /run/redis && sleep infinity"
+    restart: unless-stopped
+
+  unbound-db:
+    container_name: unbound-db
+    image: redis:alpine
+    depends_on:
+      - unbound-db-socket
+    volumes_from:
+      - unbound-db-socket
+    volumes:
+      - redis-data:/data
+      - ./data/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server /usr/local/etc/redis/redis.conf
+    restart: unless-stopped
+
+  unbound:
+    container_name: unbound
+    image: madnuttah/unbound:latest
+    depends_on:
+      - unbound-db
+    volumes_from:
+      - unbound-db-socket
+    volumes:
+      - ./data/unbound/unbound.conf:/usr/local/unbound/unbound.conf:ro
+      - ./data/unbound/conf.d:/usr/local/unbound/conf.d:ro
+      - ./data/unbound/iana.d:/usr/local/unbound/iana.d:rw
+      - ./data/unbound/zones.d:/usr/local/unbound/zones.d:ro
+      - ./data/unbound/log.d:/usr/local/unbound/log.d:rw
+      - ./data/unbound/healthcheck.sh:/usr/local/unbound/sbin/healthcheck.sh:ro
+      - cachedb.d:/usr/local/unbound/cachedb.d/  # Para cache Redis persistente
+    ports:
+      - "10.10.10.9:53:53/tcp"
+      - "10.10.10.9:53:53/udp"
+    cap_add:
+      - NET_BIND_SERVICE
+    environment:
+      TZ: America/Sao_Paulo
+      DISABLE_SET_PERMS: 1 # ou "true" 
+      UNBOUND_UID: 1000
+      UNBOUND_GID: 1000
+      HEALTHCHECK_PORT: 53
+      EXTENDED_HEALTHCHECK: true
+      # EXTENDED_HEALTHCHECK_DOMAIN: nlnetlabs.nl
+      ENABLE_STATS: true
+    healthcheck:
+      test: ["CMD-SHELL", "/usr/local/unbound/sbin/healthcheck.sh"]
+      interval: 60s
+      timeout: 30s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+volumes:
+  unbound-db-sock:
+  redis-data:
+  cachedb.d:
+
+# mkdir -pv data/unbound/{conf.d,iana.d,zones.d,log.d}
+# mkdir -pv data/redis

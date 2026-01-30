@@ -1,0 +1,71 @@
+server:
+  username: "unbound"
+  directory: "/usr/local/unbound"
+  chroot: ""
+  pidfile: "/usr/local/unbound/unbound.pid"
+  auto-trust-anchor-file: "/usr/local/unbound/iana.d/root.key"
+
+  interface: 0.0.0.0@53
+  access-control: 127.0.0.0/8 allow
+  access-control: 10.10.10.0/24 allow
+  private-address: 10.0.0.0/8
+  private-address: 172.16.0.0/12
+  private-address: 192.168.0.0/16
+
+  do-ip4: yes
+  do-ip6: no
+  do-udp: yes
+  do-tcp: yes
+  tls-upstream: no
+  harden-glue: yes
+  harden-dnssec-stripped: yes
+  use-caps-for-id: yes
+  hide-identity: yes
+  hide-version: yes
+  qname-minimisation: yes
+  aggressive-nsec: yes
+  val-clean-additional: yes
+  unwanted-reply-threshold: 10000
+  ratelimit: 1000
+
+  num-threads: 1
+  msg-cache-slabs: 4
+  rrset-cache-slabs: 4
+  infra-cache-slabs: 4
+  key-cache-slabs: 4
+  msg-cache-size: 128m
+  rrset-cache-size: 256m
+  cache-min-ttl: 300
+  cache-max-ttl: 86400
+  prefetch: yes
+  prefetch-key: yes
+  serve-expired: yes
+  neg-cache-size: 4M
+  outgoing-range: 8192
+  num-queries-per-thread: 4096
+  edns-buffer-size: 1232
+  max-udp-size: 4096
+  msg-buffer-size: 65552
+
+  extended-statistics: yes
+  statistics-interval: 0
+  statistics-cumulative: no
+
+  remote-control:
+    control-enable: yes
+    control-interface: 127.0.0.1
+    control-port: 8953
+    server-key-file: "/usr/local/unbound/unbound_server.key"
+    server-cert-file: "/usr/local/unbound/unbound_server.pem"
+    control-key-file: "/usr/local/unbound/unbound_control.key"
+    control-cert-file: "/usr/local/unbound/unbound_control.pem"
+
+  module-config: "validator cachedb iterator"
+
+cachedb:
+  backend: "redis"
+  redis-server-host: /run/redis/redis.sock
+  redis-server-port: 0
+  redis-timeout: 100
+  redis-expire-records: yes
+  redis-db: 0
