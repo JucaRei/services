@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   technitium:
     image: technitium/dns-server:14.3.0
@@ -5,7 +7,6 @@ services:
     hostname: dns01
     restart: unless-stopped
 
-    # DNS que o container usa (ok manter)
     dns:
       - 10.10.10.53
 
@@ -16,34 +17,23 @@ services:
       - edns0
 
     ports:
-      # DNS LAN (OBRIGATÓRIO)
       - "53:53/udp"
       - "53:53/tcp"
-
-      # Web UI
       - "5380:5380/tcp"
       - "53443:53443/tcp"
 
     environment:
-      # Identidade
-      - DNS_SERVER_DOMAIN=dns01
-
-      # 🔴 ESSENCIAL — força bind real
-      - DNS_SERVER_LISTEN_ADDRESSES=0.0.0.0,::
-
-      # Forward para Unbound externo
-      - DNS_SERVER_FORWARDERS=10.10.10.53
-      - DNS_SERVER_FORWARDER_PROTOCOL=Udp
-
-      - DNS_SERVER_RECURSION=Allow
-      - DNS_SERVER_PREFER_IPV4=true
-      - DNS_SERVER_LOG_QUERIES=false
-
-      # Admin
-      - DNS_SERVER_ADMIN_PASSWORD=200291
+      DNS_SERVER_DOMAIN: dns01
+      DNS_SERVER_LISTEN_ADDRESSES: "0.0.0.0,::"
+      DNS_SERVER_FORWARDERS: "10.10.10.53"
+      DNS_SERVER_FORWARDER_PROTOCOL: Udp
+      DNS_SERVER_RECURSION: Allow
+      DNS_SERVER_PREFER_IPV4: "true"
+      DNS_SERVER_LOG_QUERIES: "false"
+      DNS_SERVER_ADMIN_PASSWORD: "200291"
 
     volumes:
-      - ./technitium-config:/etc/dns
+      - technitium-config:/etc/dns
 
     extra_hosts:
       - "dns02.cloud.local:10.10.10.26"
@@ -53,3 +43,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+
+volumes:
+  technitium-config:
+    name: technitium-dns01-config
