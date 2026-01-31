@@ -1,8 +1,8 @@
 services:
   unbound-db-socket:
     container_name: unbound-db-socket
-    init: true
-    tty: true
+    # init: true
+    # tty: true
     image: busybox:latest
     volumes:
       - unbound-db-sock:/run/redis
