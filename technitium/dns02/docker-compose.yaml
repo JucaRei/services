@@ -14,7 +14,7 @@ services:
 
     # Bootstrap DNS
     dns:
-      - 10.10.10.53
+      - 10.10.10.53 # Unbound externo
       # - 10.10.10.25
       # - 1.1.1.1
 
@@ -30,31 +30,38 @@ services:
       - "53444:53443/tcp" # HTTPS (DEPOIS do cluster)
       
       # DNS LAN
-      - "53:53/udp"
-      - "53:53/tcp"
+      # NÃO mapear 53 se já estiver bindando no host
+      # - "53:53/udp"
+      # - "53:53/tcp"
 
     environment:
       # Identidade
-      - DNS_SERVER_DOMAIN=dns02
+      DNS_SERVER_DOMAIN: "dns02"
 
       # Sem cluster aqui também.
       # O dns02 entra no cluster via WebUI.
 
+      # Forward para Unbound
+      DNS_SERVER_FORWARDERS: "10.10.10.53"
+      DNS_SERVER_FORWARDER_PROTOCOL: "Udp"
+
+      DNS_SERVER_LISTEN_ADDRESSES: "10.10.10.25,::"
+
       # - DNS_SERVER_FORWARDERS=10.10.10.25:5335
-      - DNS_SERVER_FORWARDERS=10.10.10.53:53
-      - DNS_SERVER_FORWARDER_PROTOCOL=Udp
+      # - DNS_SERVER_FORWARDERS=10.10.10.53:53
+      # - DNS_SERVER_FORWARDER_PROTOCOL=Udp
 
       # Comportamento de resolução
-      - DNS_SERVER_RECURSION=Allow
-      - DNS_SERVER_PREFER_IPV4=true
-      - DNS_SERVER_LOG_QUERIES=false
+      DNS_SERVER_RECURSION: "Allow"
+      DNS_SERVER_PREFER_IPV4: "true"
+      DNS_SERVER_LOG_QUERIES: "false"
 
       # Admin
-      - DNS_SERVER_ADMIN_PASSWORD=200291
+      DNS_SERVER_ADMIN_PASSWORD: "200291"
 
     volumes:
       # - ./technitium-config:/etc/dns
-      - technitium-config:/etc/dns
+      - technitium-dns02-config:/etc/dns
 
     # Para resolver o peer antes do DNS estar funcional
     extra_hosts:
@@ -68,7 +75,8 @@ services:
       retries: 3
 
 volumes:
-  technitium-config:
+  technitium-dns02-config:
+    name: technitium-dns02-config
 
 # networks:
 #   dns-net:
