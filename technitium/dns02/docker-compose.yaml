@@ -53,7 +53,8 @@ services:
       - DNS_SERVER_ADMIN_PASSWORD=200291
 
     volumes:
-      - ./technitium-config:/etc/dns
+      # - ./technitium-config:/etc/dns
+      - technitium-config:/etc/dns
 
     # Para resolver o peer antes do DNS estar funcional
     extra_hosts:
@@ -65,6 +66,9 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+
+volumes:
+  technitium-config:
 
 # networks:
 #   dns-net:
