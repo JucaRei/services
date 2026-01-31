@@ -28,6 +28,9 @@ services:
       # Web UI (não conflita com dns01)
       - "5381:5380/tcp" # HTTP (ANTES do cluster)
       - "53444:53443/tcp" # HTTPS (DEPOIS do cluster)
+
+      - "10.10.10.25:53:53/udp"
+      - "10.10.10.25:53:53/tcp"
       
       # DNS LAN
       # NÃO mapear 53 se já estiver bindando no host
