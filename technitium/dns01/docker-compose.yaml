@@ -54,7 +54,7 @@ services:
       # Força uso do Unbound (evita 127.0.0.11)
       # - 172.30.0.2
 
-      - 10.10.10.53
+      - 10.10.10.53 # DNS que o container usa (ok manter)
 
     dns_search: []
     dns_opt:
@@ -70,22 +70,27 @@ services:
       # HTTPS (DEPOIS do cluster)
       - "53443:53443/tcp"
 
+      # DNS LAN (OBRIGATÓRIO)
       # DNS LAN
-      # - "53:53/udp"
-      # - "53:53/tcp"
+      - "53:53/udp"
+      - "53:53/tcp"
 
     environment:
       # Identidade
       - DNS_SERVER_DOMAIN=dns01
+
+      # 🔴 ESSENCIAL — força bind real
+      - DNS_SERVER_LISTEN_ADDRESSES=0.0.0.0,::
 
       # IMPORTANTE:
       # NÃO defina cluster aqui.
       # O cluster será criado via WebUI.
       # Isso evita conflito de endpoints.
 
-      ## Forward para Unbound local
+      # Forward para Unbound externo
+      - DNS_SERVER_FORWARDERS=10.10.10.53
+      - DNS_SERVER_FORWARDER_PROTOCOL=Udp
       # - DNS_SERVER_FORWARDERS=10.10.10.25:5335
-      # - DNS_SERVER_FORWARDER_PROTOCOL=Udp
 
       # Forwarders → Unbound externo
       - DNS_SERVER_RECURSION=Allow
@@ -96,7 +101,7 @@ services:
       - DNS_SERVER_ADMIN_PASSWORD=200291
 
     volumes:
-      - ./technitium-config:/etc/dns
+      # - ./technitium-config:/etc/dns
       - technitium-config:/etc/dns
 
     # Resolve o peer ANTES do DNS existir
