@@ -1,60 +1,13 @@
 services:
-  # ==========================================================
-  # Unbound – Recursive resolver (DNSSEC)
-  # ==========================================================
-  # unbound:
-  #   image: alpinelinux/unbound:latest
-  #   container_name: unbound
-  #   restart: unless-stopped
-
-    # networks:
-    #   dns-net:
-    #     ipv4_address: 172.30.0.2
-
-    #volumes:
-    #  - ./unbound-config:/etc/unbound
-
-    #ports:
-    #  ## Porta usada pelo Technitium e pelo dns02
-    #  - "5335:5335/udp"
-    #  - "5335:5335/tcp"
-
-    # command:
-    #   - unbound
-    #   - -d
-    #   - -c
-    #   - /etc/unbound/unbound.conf
-
-    ## Healthcheck garante que o Technitium
-    ## só suba quando o Unbound estiver funcional
-    #healthcheck:
-    #  test: ["CMD-SHELL", "apk add --no-cache bind-tools >/dev/null 2>&1 || true; dig @127.0.0.1 -p 5335 . +short >/dev/null"]
-    #  interval: 15s
-    #  timeout: 5s
-    #  retries: 5
-
-  # ==========================================================
-  # Technitium DNS – PRIMARY
-  # ==========================================================
   technitium:
     image: technitium/dns-server:14.3.0
-    container_name: dns-server-primary
+    container_name: dns01
     hostname: dns01
     restart: unless-stopped
 
-    # depends_on:
-    #   unbound:
-    #     condition: service_healthy
-
-    # networks:
-    #   dns-net:
-    #     ipv4_address: 172.30.0.3
-
+    # DNS que o container usa (ok manter)
     dns:
-      # Força uso do Unbound (evita 127.0.0.11)
-      # - 172.30.0.2
-
-      - 10.10.10.53 # DNS que o container usa (ok manter)
+      - 10.10.10.53
 
     dns_search: []
     dns_opt:
@@ -63,17 +16,13 @@ services:
       - edns0
 
     ports:
-      ## Web UI
-      # HTTP (ANTES do cluster)
-      - "5380:5380/tcp" 
-
-      # HTTPS (DEPOIS do cluster)
-      - "53443:53443/tcp"
-
       # DNS LAN (OBRIGATÓRIO)
-      # DNS LAN
       - "53:53/udp"
       - "53:53/tcp"
+
+      # Web UI
+      - "5380:5380/tcp"
+      - "53443:53443/tcp"
 
     environment:
       # Identidade
@@ -82,17 +31,10 @@ services:
       # 🔴 ESSENCIAL — força bind real
       - DNS_SERVER_LISTEN_ADDRESSES=0.0.0.0,::
 
-      # IMPORTANTE:
-      # NÃO defina cluster aqui.
-      # O cluster será criado via WebUI.
-      # Isso evita conflito de endpoints.
-
       # Forward para Unbound externo
       - DNS_SERVER_FORWARDERS=10.10.10.53
       - DNS_SERVER_FORWARDER_PROTOCOL=Udp
-      # - DNS_SERVER_FORWARDERS=10.10.10.25:5335
 
-      # Forwarders → Unbound externo
       - DNS_SERVER_RECURSION=Allow
       - DNS_SERVER_PREFER_IPV4=true
       - DNS_SERVER_LOG_QUERIES=false
@@ -101,26 +43,13 @@ services:
       - DNS_SERVER_ADMIN_PASSWORD=200291
 
     volumes:
-      # - ./technitium-config:/etc/dns
-      - technitium-config:/etc/dns
+      - ./technitium-config:/etc/dns
 
-    # Resolve o peer ANTES do DNS existir
     extra_hosts:
       - "dns02.cloud.local:10.10.10.26"
 
-    # Healthcheck do próprio Technitium
     healthcheck:
       test: ["CMD", "dig", "@127.0.0.1", "go.technitium.com", "+short"]
       interval: 30s
       timeout: 5s
       retries: 3
-
-volumes:
-  technitium-config:
-
-# networks:
-#   dns-net:
-#     driver: bridge
-#     ipam:
-#       config:
-#         - subnet: 172.30.0.0/24
