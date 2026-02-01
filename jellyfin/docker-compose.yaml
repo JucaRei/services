@@ -17,7 +17,8 @@ services:
     # privileged: true
     volumes:
       #- jellyfin-transcode:/config/transcodes
-      - ./config:/config
+      # - ./config:/config
+      - jellyfin-config:/config
 
       ### Orico samba from soyoz
       - /mnt/orico/Animes:/animes3
@@ -63,12 +64,15 @@ services:
     # mem_limit: 1350M
     # mem_reservation: 200M
     # cpus: 0.8
-#volumes:
+
+volumes:
+  jellyfin-config:
 #  jellyfin-transcode:
 
 networks:
   media:
     driver: bridge
+    name: media
 
 # docker volume create \
 #  --driver local \
