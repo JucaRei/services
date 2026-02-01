@@ -1,0 +1,78 @@
+# Proxmox Jellyfin Docker Compose file - Soyoz
+
+services:
+  jellyfin:
+    #image: jellyfin/jellyfin:2026011205
+    image: lscr.io/linuxserver/jellyfin:10.11.5
+    container_name: media
+    restart: unless-stopped
+    networks:
+      - media
+    environment:
+      - PUID=1000
+      - PGID=1000
+      #- JELLYFIN_PublishedServerUrl=http://localhost:3545
+      - TZ=America/Sao_Paulo
+      - UMASK_SET=022 #optional
+    # privileged: true
+    volumes:
+      #- jellyfin-transcode:/config/transcodes
+      - ./config:/config
+
+      ### Orico samba from soyoz
+      - /mnt/orico/Animes:/animes3
+      - /mnt/orico/Filmes:/filmes3
+      - /mnt/orico/Seriados:/series3
+
+      ### HD 700gb
+      - /mnt/700gb/Animes:/animes
+      - /mnt/700gb/Tvshows:/series
+      - /mnt/700gb/Movies:/filmes
+
+      ### HD 400gb
+      - /mnt/hd400g/Animes:/animes1
+      - /mnt/hd400g/TvShows:/series1
+      - /mnt/hd400g/Movies:/filmes1
+
+      ### HD 2TB
+      - /mnt/hd2tb/Animes:/animes2
+      - /mnt/hd2tb/Series:/series2
+      - /mnt/hd2tb/Filmes:/filmes2
+    devices:
+    ## Intel
+      - /dev/dri:/dev/dri # For hardware acceleration (optional)
+      #- /dev/dri/renderD128:/dev/dri/renderD128 # For hardware acceleration (optional)
+      #- /dev/dri/card1:/dev/dri/card1 # For hardware acceleration (optional)
+
+    ## Rockchip
+    #  - /dev/rga:/dev/rga #Specific for RK35XX SoC
+    #  - /dev/dri:/dev/dri
+    #  - /dev/dri/card0:/dev/dri/card0 #Important - device for transcoding
+    #  - /dev/dri/renderD128:/dev/dri/renderD128 #Important, same as above
+    #  - /dev/dma_heap:/dev/dma_heap #Specific for RK35XX SoC
+    #  - /dev/mpp_service:/dev/mpp_service #Specific for RK35XX SoC
+    #  - /dev/mali0:/dev/mali0 # only required to enable OpenCL-accelerated HDR -> SDR tonemapping #Specific for RK35XX SoC
+    ports:
+    - 3545:8096
+    # - 8920:8920 #optional
+    # - 7359:7359/udp #optional
+    # - 1900:1900/udp #optional
+    group_add:
+      - 44 # video group for hardware acceleration (optional)
+      - 992 # render group for hardware acceleration (optional)
+    # mem_limit: 1350M
+    # mem_reservation: 200M
+    # cpus: 0.8
+#volumes:
+#  jellyfin-transcode:
+
+networks:
+  media:
+    driver: bridge
+
+# docker volume create \
+#  --driver local \
+#  --opt type=tmpfs \
+#  --opt device=tmpfs \
+#  --opt o=size=10g \
+#  jellyfin-transcode

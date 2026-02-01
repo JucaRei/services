@@ -1,0 +1,114 @@
+# Proxmox Tdarr Docker Compose file - Soyoz
+
+services:
+  tdarr:
+    image: ghcr.io/haveagitgat/tdarr:latest
+    container_name: tdarr
+    restart: unless-stopped
+    network_mode: "bridge"
+    ports:
+      - "5555:8265"   # Web UI
+      - "5556:8266"   # Server port (node comms)
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+      - internalNode=true   # run Node inside Server container (optional)
+    volumes:
+      # - ./main/server:/app/server
+      # - ./main/configs:/app/configs
+      # - ./main/logs:/app/logs
+      
+      - main-server:/app/server
+      - main-configs:/app/configs
+      - main-logs:/app/logs
+
+      # Media 500GB
+      - /mnt/500gb/Media/Animes:/500gb_Animes
+      - /mnt/500gb/Media/Movies:/500gb_Filmes
+      - /mnt/500gb/Media/TvShows:/500gb_Series
+
+      # Media 700GB
+      - /mnt/700gb/Animes:/700gb_Animes
+      - /mnt/700gb/Movies:/700gb_Filmes
+      - /mnt/700gb/Tvshows:/700gb_Series
+
+      # Media orico
+      - /mnt/orico/Animes:/orico_Animes
+      - /mnt/orico/Filmes:/orico_Filmes
+      - /mnt/orico/Tvshows/:/orico_Series
+
+      # Media hd2tb
+      - /mnt/hd2tb/Animes:/hd2tb_Animes
+      - /mnt/hd2tb/Filmes:/hd2tb_Filmes
+      - /mnt/hd2tb/Seriados:/hd2tb_Series
+    
+      # Media hd400g
+      - /mnt/hd400g/Animes:/hd400g_Animes
+      - /mnt/hd400g/Movies:/hd400g_Filmes
+      - /mnt/hd400g/TvShows:/hd400g_Series
+
+    devices:
+      - /dev/dri:/dev/dri   # Intel Quick Sync device
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - seccomp:unconfined
+
+  tdarr_node:
+    image: ghcr.io/haveagitgat/tdarr_node:latest
+    container_name: tdarr_node
+    restart: unless-stopped
+    depends_on:
+      - tdarr
+    
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Sao_Paulo
+      - SERVERIP=tdarr
+      - SERVERPORT=8266
+    
+    volumes:
+      # - ./node/config:/app/config
+      - node-config:/app/config
+      
+      # Media 500GB
+      - /mnt/500gb/Media/Animes:/500gb_Animes
+      - /mnt/500gb/Media/Movies:/500gb_Filmes
+      - /mnt/500gb/Media/TvShows:/500gb_Series
+
+      # Media 700GB
+      - /mnt/700gb/Animes:/700gb_Animes
+      - /mnt/700gb/Movies:/700gb_Filmes
+      - /mnt/700gb/Tvshows:/700gb_Series
+
+      # Media orico
+      - /mnt/orico/Animes:/orico_Animes
+      - /mnt/orico/Filmes:/orico_Filmes
+      - /mnt/orico/Tvshows:/orico_Series
+
+      # Media hd2tb
+      - /mnt/hd2tb/Animes:/hd2tb_Animes
+      - /mnt/hd2tb/Filmes:/hd2tb_Filmes
+      - /mnt/hd2tb/Seriados:/hd2tb_Series
+    
+      # Media hd400g
+      - /mnt/hd400g/Animes:/hd400g_Animes
+      - /mnt/hd400g/Movies:/hd400g_Filmes
+      - /mnt/hd400g/TvShows:/hd400g_Series
+    
+    devices:
+      - /dev/dri:/dev/dri
+    
+    cap_add:
+      - SYS_ADMIN
+    
+    security_opt:
+      - seccomp:unconfined
+
+volumes:
+  main-server:
+  main-configs:
+  main-logs:
+  node-config:

@@ -1,3 +1,5 @@
+# Docker Compose file for Technitium DNS Server - dns02 - Nanopi R3S
+
 services:
   # ==========================================================
   # Technitium DNS – SECONDARY

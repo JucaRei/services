@@ -1,3 +1,5 @@
+# Docker Compose file for Unbound DNS with Redis cache backend - Nanopi R3S
+
 services:
   unbound-db-socket:
     container_name: unbound-db-socket

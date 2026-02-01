@@ -1,3 +1,5 @@
+# Docker Compose file for Technitium DNS Server - dns01 - Nanopi R3S
+
 services:
   technitium:
     image: technitium/dns-server:14.3.0
