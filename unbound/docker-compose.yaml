@@ -32,11 +32,11 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
-    deploy: 
-      resources:
-        limits:
-          cpus: '0.2'
-          memory: 100M
+    # deploy: 
+    #   resources:
+    #     limits:
+    #       cpus: '0.2'
+    #       memory: 100M
 
   unbound:
     container_name: unbound
@@ -86,11 +86,11 @@ services:
       start_period: 15s
     restart: unless-stopped
 
-    deploy: 
-      resources:
-        limits:
-          cpus: '0.8'
-          memory: 150M
+    # deploy: 
+    #   resources:
+    #     limits:
+    #       cpus: '0.8'
+    #       memory: 150M
 
 volumes:
   unbound-db-sock:
