@@ -3,7 +3,7 @@
 services:
   jellyfin:
     #image: jellyfin/jellyfin:2026011205
-    image: lscr.io/linuxserver/jellyfin:10.11.5
+    image: lscr.io/linuxserver/jellyfin:10.11.6
     container_name: media
     restart: unless-stopped
     networks:

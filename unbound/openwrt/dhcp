@@ -1,0 +1,146 @@
+config dnsmasq
+        option domainneeded '1'
+        option boguspriv '1'
+        option localise_queries '1'
+        // # option rebind_protection '0'
+        option rebind_protection '1'    // # Ativar proteção contra rebind (segurança)
+        option local '/lan/'
+        option domain 'lan'
+        option expandhosts '1'
+        option authoritative '1'
+        option noresolv '1'
+        list server '10.10.10.25'
+        list server '10.10.10.26'
+        list server '8.8.8.8'
+        list server '1.1.1.1'
+        list server '/cache.nixos.org/8.8.8.8'
+        list server '/cache.nixos.org/1.1.1.1'
+        option cachesize '1000'
+        // option dnssec '0'  
+        option dnssec '1'   // # Ativar DNSSEC para validação de DNS
+        option ednspacket_max '1232'
+
+config dhcp 'lan'
+        option interface 'lan'
+        option start '100'
+        option limit '150'
+        option leasetime '12h'
+        option dhcpv4 'server'
+        option dhcpv6 'server'
+        option ra 'server'
+        list ra_flags 'managed-config'
+        list ra_flags 'other-config'
+        list dhcp_option '6,10.10.10.25'
+        list dhcp_option '6,10.10.10.26'
+
+config dhcp 'wan'
+        option interface 'wan'
+        option ignore '1'
+
+config odhcpd 'odhcpd'
+        option maindhcp '0'
+        option leasefile '/tmp/hosts/odhcpd'
+        option leasetrigger '/usr/sbin/odhcpd-update'
+        option loglevel '4'
+
+config host
+        option name 'soyoz'
+        option ip '10.10.10.5'
+        option leasetime '12h'
+        list tag 'server'
+        list mac 'XX:XX:XX:XX:XX:XX'
+        list mac 'XX:XX:XX:XX:XX:XX'
+
+config host
+        option name 'docker'
+        list mac 'XX:XX:XX:XX:XX:XX'
+        option ip '10.10.10.140'
+        option leasetime '12h'
+        list tag 'proxmox-lxc'
+
+config host
+        option name 'video'
+        option ip '10.10.10.120'
+        option leasetime '12h'
+        list tag 'proxmox-lxc'
+        list mac 'XX:XX:XX:XX:XX:XX'
+
+config host
+        option name 'nitro'
+        option ip '10.10.10.2'
+        option leasetime '12h'
+        list tag 'pc'
+        list mac 'XX:XX:XX:XX:XX:XX'
+        list mac 'XX:XX:XX:XX:XX:XX'
+
+config host
+        option name 'Chromecast'
+        list mac 'XX:XX:XX:XX:XX:XX'
+        option ip '10.10.10.100'
+        option leasetime '12h'
+        list tag 'Tv'
+
+config host
+        option name 'Shacenter-DNS-325'
+        list mac 'XX:XX:XX:XX:XX:XX'
+        option ip '10.10.10.10'
+        option leasetime '12h'
+        list tag 'server'
+
+config host
+        option name 'lafrite'
+        list mac 'XX:XX:XX:XX:XX:XX'
+        option ip '10.10.10.20'
+        option leasetime '3h'
+        list tag 'server'
+
+config host
+        option name 'Asus-Cozinha'
+        list mac 'XX:XX:XX:XX:XX:XX'
+        option ip '10.10.10.30'
+        option leasetime '12h'
+        list tag 'internet'
+
+config host
+        option name 'Iphone-Mae'
+        list mac 'XX:XX:XX:XX:XX:XX'
+        option ip '10.10.10.41'
+        option leasetime '12h'
+        list tag 'cel'
+
+config host
+        option name 'Galaxy-Note8'
+        list mac 'XX:XX:XX:XX:XX:XX'
+        option ip '10.10.10.42'
+        option leasetime '12h'
+        list tag 'cel'
+
+config host
+        option name 'FireTv-Sala'
+        list mac 'XX:XX:XX:XX:XX:XX'
+        option ip '10.10.10.50'
+        option leasetime '3h'
+        list tag 'Tv'
+
+config host
+        option name 'dns01'
+        list mac 'XX:XX:XX:XX:XX:XX'
+        option ip '10.10.10.25'
+        option leasetime '3h'
+        list tag 'server'
+        list tag 'lxc'
+
+config host
+        option name 'dns02'
+        list mac 'XX:XX:XX:XX:XX:XX'
+        option ip '10.10.10.26'
+        list tag 'server'
+        list tag 'lxc'
+
+config host
+        option name 'unbound'
+        list mac 'XX:XX:XX:XX:XX:XX'
+        option ip '10.10.10.53'
+        option leasetime '12h'
+        list tag 'server'
+        list tag 'lxc'
