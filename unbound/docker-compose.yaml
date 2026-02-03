@@ -98,11 +98,12 @@ services:
     volumes:
       - ./data/unbound/log.d:/var/log/unbound-stats:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      # - ./zabbix/conf:/etc/zabbix/zabbix_agent2.d:ro
+      # - ./data/zabbix/Statistics.json:/etc/zabbix/zabbix_agent2.d:ro
     environment:
       - ZBX_HOSTNAME=unbound-server
-      - ZBX_SERVER_HOST=10.10.10.53
+      - ZBX_SERVER_HOST= # Deixar vazio para modo passivo
       - ZBX_SERVER_PORT=10051
+      - ZBX_PASSIVE=yes   # Modo passivo
     restart: unless-stopped
   
 
@@ -111,6 +112,7 @@ volumes:
   redis-data:
   cachedb.d:
   unbound-pid:
+  # zabbix-data:
 
 # mkdir -pv data/unbound/{conf.d,iana.d,zones.d,log.d}
 # mkdir -pv data/redis
