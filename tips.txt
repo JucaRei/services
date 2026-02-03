@@ -1,0 +1,21 @@
+#XZ_OPT=-9 sudo tar -cJvf unbound.tar.xz \
+#    --exclude=/opt/lxc/unbound/rootfs/tmp \
+#    --exclude=/opt/lxc/unbound/rootfs/var/cache \
+#    /opt/lxc/unbound
+
+# Compress lxc container
+
+XZ_OPT=-9 tar -cJvf unbound.tar.xz \
+    --exclude=/opt/lxc/unbound/rootfs/tmp \
+    --exclude=/opt/lxc/unbound/rootfs/var/cache \
+    /opt/lxc/unbound
+
+XZ_OPT=-9 tar -cJvf dns01.tar.xz \
+    --exclude=/opt/lxc/dns01/rootfs/tmp \
+    --exclude=/opt/lxc/dns01/rootfs/var/cache \
+    /opt/lxc/dns01
+
+XZ_OPT=-9 tar -cJvf dns02.tar.xz \
+    --exclude=/opt/lxc/dns02/rootfs/tmp \
+    --exclude=/opt/lxc/dns02/rootfs/var/cache \
+    /opt/lxc/dns02
