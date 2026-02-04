@@ -23,7 +23,8 @@ services:
     volumes_from:
       - unbound-db-socket
     volumes:
-      - redis-data:/data
+      # - redis-data:/data
+      - ./cache/redis:/data
       - ./data/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
     command: redis-server /usr/local/etc/redis/redis.conf
     restart: unless-stopped
@@ -57,7 +58,8 @@ services:
       - ./data/unbound/healthcheck.sh:/usr/local/unbound/sbin/healthcheck.sh:ro
       - ./data/unbound/root.hints:/usr/local/unbound/root.hints:ro
       - ./data/unbound/root.key:/usr/local/unbound/root.key:rw
-      - cachedb.d:/usr/local/unbound/cachedb.d/ # Para cache Redis persistente
+      # - cachedb.d:/usr/local/unbound/cachedb.d/ # Para cache Redis persistente
+      - ./cache/cachedb.d:/usr/local/unbound/cachedb.d/ # Para cache Redis persistente
       - unbound-pid:/var/run  # Volume for PID file
     ports:
     #   # - "10.10.10.53:53:53/tcp"
@@ -110,8 +112,8 @@ services:
 
 volumes:
   unbound-db-sock:
-  redis-data:
-  cachedb.d:
+  # redis-data:
+  # cachedb.d:
   unbound-pid:
   # zabbix-data:
 
