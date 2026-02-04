@@ -8,7 +8,8 @@ services:
     image: busybox:latest
     volumes:
       - unbound-db-sock:/run/redis
-      - cachedb.d:/usr/local/unbound/cachedb.d/
+      # - cachedb.d:/usr/local/unbound/cachedb.d/
+      - ./cache/cachedb.d:/usr/local/unbound/cachedb.d/
     # command: /bin/sh -c "mkdir -p /run/redis && chown 999:1000 /run/redis && chmod 770 /run/redis && sleep infinity"
     # command: /bin/sh -c "mkdir -p /run/redis && chown 999:1000 /run/redis && chmod 770 /run/redis && tail -f /dev/null"
     command: /bin/sh -c "mkdir -p /run/redis && chown 1000:1000 /run/redis && chmod 770 /run/redis && tail -f /dev/null"
