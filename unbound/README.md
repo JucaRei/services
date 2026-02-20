@@ -260,3 +260,9 @@ uci commit dhcp
 **Common Issues:**
 - **SERVFAIL errors**: May indicate DNSSEC validation blocking invalid responses
 - **Slow resolution**: Check firewall rules and network connectivity
+
+**Fix Path**
+```bash
+sudo chown -R 999:999 ./cache/redis ./data/unbound ./cache/cachedb.d
+sudo chmod -R 770 ./cache/redis ./data/unbound/log.d
+```
