@@ -1,0 +1,31 @@
+server:
+    # interface: 0.0.0.0@53
+    module-config: "validator cachedb iterator" # Fixed order
+    # username: ""
+    directory: "/usr/local/unbound"
+    chroot: ""
+    do-daemonize: no
+    # tls-cert-bundle: /etc/ssl/certs/ca-certificates.crt
+    # pidfile: "/usr/local/unbound/unbound.pid"
+    # pidfile: "/var/run/unbound.pid"  # Changed to writable location
+    # pidfile: ""  # eliminar PID completamente
+    pidfile: "/dev/null"
+    # root-hints: "/usr/local/unbound/root.hints"
+    root-hints: "/usr/local/unbound/iana.d/root.hints"
+
+include-toplevel: "/usr/local/unbound/conf.d/*.conf"
+include-toplevel: "/usr/local/unbound/zones.d/*.conf"
+
+# cachedb:
+#     backend: "redis"
+#     redis-server-host: "unbound-db"
+#     redis-server-port: 6379
+#     redis-timeout: 100
+#     redis-expire-records: yes
+
+cachedb:
+    backend: "redis"
+    redis-server-path: "/run/redis/redis.sock"   # ← This is the key change
+    redis-timeout: 50                            # Lower than 100 ms – good for local socket
+    redis-expire-records: yes                    # Let Redis handle TTL expiration automatically
+    # redis-expire-records: no                          # Alternative: Unbound manages TTL (more accurate but more CPU)

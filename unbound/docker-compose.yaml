@@ -67,6 +67,7 @@ services:
       - ./data/unbound/root.key:/usr/local/unbound/root.key:rw
       # - cachedb.d:/usr/local/unbound/cachedb.d/ # Para cache Redis persistente
       - ./cache/cachedb.d:/usr/local/unbound/cachedb.d/ # Para cache Redis persistente
+      - ./data/unbound/control-keys:/usr/local/unbound/control-keys:ro
       - unbound-pid:/var/run  # Volume for PID file
     ports:
     #   # - "10.10.10.53:53:53/tcp"

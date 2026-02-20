@@ -1,1 +1,5 @@
 .vscode
+unbound/data/unbound/control-keys/
+unbound/cache/redis/dump.rdb
+unbound/cache/redis/redis.pid
+unbound/data/unbound/log.d/unbound.log
