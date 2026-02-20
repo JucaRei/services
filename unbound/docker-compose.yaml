@@ -10,10 +10,8 @@ services:
       - unbound-db-sock:/run/redis
       # - cachedb.d:/usr/local/unbound/cachedb.d/
       - ./cache/cachedb.d:/usr/local/unbound/cachedb.d/
-    # command: /bin/sh -c "mkdir -p /run/redis && chown 999:1000 /run/redis && chmod 770 /run/redis && sleep infinity"
     # command: /bin/sh -c "mkdir -p /run/redis && chown 999:1000 /run/redis && chmod 770 /run/redis && tail -f /dev/null"
-    # command: /bin/sh -c "mkdir -p /run/redis && chown 1000:1000 /run/redis && chmod 770 /run/redis && tail -f /dev/null"
-    command: /bin/sh -c "mkdir -p /run/redis && chown 999:1000 /run/redis && chmod 770 /run/redis && tail -f /dev/null"
+    command: /bin/sh -c "mkdir -p /run/redis && chown 999:999 /run/redis && chmod 770 /run/redis && tail -f /dev/null"
     restart: unless-stopped
 
   unbound-db:
@@ -30,11 +28,18 @@ services:
       - ./data/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
     command: redis-server /usr/local/etc/redis/redis.conf
     restart: unless-stopped
+    # healthcheck:
+    #   test: ["CMD", "redis-cli", "ping"]
+    #   interval: 5s
+    #   timeout: 3s
+    #   retries: 5
+
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "redis-cli -s /run/redis/redis.sock ping | grep -q PONG || exit 1"]
       interval: 5s
       timeout: 3s
       retries: 5
+
     # deploy: 
     #   resources:
     #     limits:
@@ -76,9 +81,8 @@ services:
       # Remove all user-related environment variables:
       # DISABLE_SET_PERMS: 1
       DISABLE_SET_PERMS: "true"
-      # UNBOUND_UID: 999
-      # UNBOUND_UID: 1000
-      # UNBOUND_GID: 1000
+      UNBOUND_UID: 999
+      UNBOUND_GID: 999
       HEALTHCHECK_PORT: 53
       EXTENDED_HEALTHCHECK: true
       ENABLE_STATS: true
