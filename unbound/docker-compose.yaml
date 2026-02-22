@@ -107,7 +107,7 @@ services:
     volumes:
       - ./data/unbound/log.d:/var/log/unbound-stats:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./data/zabbix/conf:/etc/zabbix/zabbix_agent2.d:ro
+      - zabbix-agent-conf:/etc/zabbix/zabbix_agent2.d
     environment:
       - ZBX_HOSTNAME=unbound-server
       - ZBX_SERVER_HOST=127.0.0.1  # Localhost only (or empty)
@@ -122,6 +122,7 @@ volumes:
   # cachedb.d:
   unbound-pid:
   # zabbix-data:
+  zabbix-agent-conf:
 
 # mkdir -pv data/unbound/{conf.d,iana.d,zones.d,log.d}
 # mkdir -pv data/redis
