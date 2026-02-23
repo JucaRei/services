@@ -110,6 +110,8 @@ services:
       - zabbix-agent-conf:/etc/zabbix/zabbix_agent2.d
     environment:
       - ZBX_HOSTNAME=unbound-server
+      - ZBX_LISTEN_PORT=8080
+      - ZBX_LISTEN_IP=0.0.0.0
       - ZBX_SERVER_HOST=127.0.0.1  # Localhost only (or empty)
       - ZBX_SERVER_ACTIVE=          # Disable active checks
       - ZBX_PASSIVE=no              # Disable passive checks
