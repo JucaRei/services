@@ -28,18 +28,11 @@ services:
       - ./data/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
     command: redis-server /usr/local/etc/redis/redis.conf
     restart: unless-stopped
-    # healthcheck:
-    #   test: ["CMD", "redis-cli", "ping"]
-    #   interval: 5s
-    #   timeout: 3s
-    #   retries: 5
-
     healthcheck:
       test: ["CMD-SHELL", "redis-cli -s /run/redis/redis.sock ping | grep -q PONG || exit 1"]
       interval: 5s
       timeout: 3s
       retries: 5
-
     # deploy: 
     #   resources:
     #     limits:
@@ -60,9 +53,10 @@ services:
       # - ./data/unbound/log.d/unbound.log:/usr/local/unbound/log.d/unbound.log:rw
       # - ./data/unbound/log.d/unbound-stats.log:/usr/local/unbound/log.d/unbound-stats.log:rw
       - ./data/unbound/log.d:/usr/local/unbound/log.d/:rw
+      - ./data/unbound/log.d/unbound-stats.log:/usr/local/unbound/log.d/unbound-stats.log:rw
       # - ./data/unbound/iana.d:/usr/local/unbound/iana.d/:rw
       - ./data/unbound/zones.d:/usr/local/unbound/zones.d/:rw
-      - ./data/unbound/healthcheck.sh:/usr/local/unbound/sbin/healthcheck.sh:ro
+      - ./data/unbound/healthcheck.sh:/usr/local/unbound/sbin/healthcheck.sh:rw # ro
       - ./data/unbound/root.hints:/usr/local/unbound/root.hints:ro
       - ./data/unbound/root.key:/usr/local/unbound/root.key:rw
       # - cachedb.d:/usr/local/unbound/cachedb.d/ # Para cache Redis persistente
@@ -94,7 +88,6 @@ services:
       retries: 5
       start_period: 15s
     restart: unless-stopped
-
     # deploy: 
     #   resources:
     #     limits:
@@ -105,23 +98,18 @@ services:
     container_name: zabbix-agent
     image: zabbix/zabbix-agent2:alpine-6.4-latest
     volumes:
-      - ./data/unbound/log.d:/var/log/unbound-stats:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - zabbix-agent-conf:/etc/zabbix/zabbix_agent2.d
-    environment:
-      - ZBX_HOSTNAME=unbound-server
-      - ZBX_SERVER_HOST=0.0.0.0/0      # Allow all for passive checks
-      - ZBX_SERVER_ACTIVE=127.0.0.2    # Dummy IP - will fail silently
-      - ZBX_LISTEN_PORT=10050
-      - ZBX_LISTEN_IP=0.0.0.0
-    ports:
-      - "10050:10050"
-    restart: unless-stopped
-
-
-
-
-  
+      - ./data/unbound/log.d/unbound-stats.log:/var/log/unbound-stats.log:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro	  
+      # - zabbix-agent-conf:/etc/zabbix/zabbix_agent2.d
+    # environment:
+    #   - ZBX_HOSTNAME=unbound-server
+    #   - ZBX_SERVER_HOST=0.0.0.0/0      # Allow all for passive checks
+    #   - ZBX_SERVER_ACTIVE=127.0.0.2    # Dummy IP - will fail silently
+    #   - ZBX_LISTEN_PORT=10050
+    #   - ZBX_LISTEN_IP=0.0.0.0
+    # ports:
+    #   - "10050:10050"
+    # restart: unless-stopped
 
 volumes:
   unbound-db-sock:
@@ -129,7 +117,7 @@ volumes:
   # cachedb.d:
   unbound-pid:
   # zabbix-data:
-  zabbix-agent-conf:
+  # zabbix-agent-conf:
 
 # mkdir -pv data/unbound/{conf.d,iana.d,zones.d,log.d}
 # mkdir -pv data/redis
