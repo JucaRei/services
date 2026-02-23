@@ -110,13 +110,13 @@ services:
       - zabbix-agent-conf:/etc/zabbix/zabbix_agent2.d
     environment:
       - ZBX_HOSTNAME=unbound-server
-      - ZBX_SERVER_HOST=127.0.0.1        # Allow localhost for passive checks
-      - ZBX_SERVER_ACTIVE=               # MUST be empty to disable active checks
-      - ZBX_LISTEN_PORT=10050            # Enable listening port
-      - ZBX_LISTEN_IP=0.0.0.0           # Listen on all interfaces
-    restart: unless-stopped
+      - ZBX_SERVER_HOST=0.0.0.0/0      # Allow all IPs for passive checks
+      - ZBX_SERVER_ACTIVE=               # Empty - disables active checks to port 10051
+      - ZBX_LISTEN_PORT=10050           # Agent listening port
+      - ZBX_LISTEN_IP=0.0.0.0          # Listen on all interfaces
     ports:
-      - "10050:10050"
+      - "10050:10050"                  # Expose agent port
+    restart: unless-stopped
   
 
 volumes:
