@@ -1,50 +1,108 @@
-# Docker Compose file for Technitium DNS Server - dns01 - Nanopi R3S
-
 services:
   technitium:
+    # Imagem fixa (evita mudanças inesperadas em updates)
     image: technitium/dns-server:14.3.0
+
+    # Nome do container (facilita debug/logs)
     container_name: dns01
+
+    # Hostname interno (usado em cluster/logs)
     hostname: dns01
+
+    # Reinicia automaticamente se cair
     restart: unless-stopped
 
+    # DNS usado pelo próprio container (não afeta o serviço DNS que ele fornece)
     dns:
       - 10.10.10.53  # Unbound externo
 
+    # Remove search domains para evitar resoluções inesperadas
     dns_search: []
+
+    # Opções do resolver interno do container
     dns_opt:
-      - use-vc
-      - ndots:0
-      - edns0
+      - use-vc   # força uso de TCP (evita truncation)
+      - ndots:0  # evita tentativas com sufixos
+      - edns0    # ativa extensões modernas de DNS
 
     ports:
+      # Expõe DNS no IP específico do host (evita conflitos)
       - "10.10.10.25:53:53/udp"
       - "10.10.10.25:53:53/tcp"
+
+      # Interface web HTTP
       - "5380:5380/tcp"
+
+      # Interface web HTTPS
       - "53443:53443/tcp"
 
     environment:
+      # Nome lógico do servidor (usado internamente / cluster)
       DNS_SERVER_DOMAIN: dns01
+
+      # Escuta em todos os IPs (necessário em container)
       DNS_SERVER_LISTEN_ADDRESSES: "0.0.0.0,::"
-      # DNS_SERVER_LISTEN_ADDRESSES: "10.10.10.25,::"
+
+      # Forwarder principal (Unbound)
       DNS_SERVER_FORWARDERS: "10.10.10.53"
-      DNS_SERVER_FORWARDER_PROTOCOL: Udp
-      DNS_SERVER_RECURSION: Allow
+
+      # Protocolos usados para encaminhar queries
+      DNS_SERVER_FORWARDER_PROTOCOL: "Udp,Tcp"
+
+      # Modo de recursão:
+      # Allow = recursivo próprio
+      # UseForwarders = usa somente o Unbound (recomendado)
+      # DNS_SERVER_RECURSION: Allow
+      DNS_SERVER_RECURSION: "UseForwarders"
+
+      # Prefere IPv4 (evita delays se IPv6 não estiver bem configurado)
       DNS_SERVER_PREFER_IPV4: "true"
+
+      # Timeout para resposta do forwarder (ms)
+      DNS_SERVER_FORWARDER_TIMEOUT: "2000"
+
+      # Número de tentativas antes de falhar
+      DNS_SERVER_FORWARDER_RETRIES: "2"
+
+      # Log de queries (desativado = melhor performance)
       DNS_SERVER_LOG_QUERIES: "false"
+
+      # Senha do painel admin (ideal mover para .env em produção)
       DNS_SERVER_ADMIN_PASSWORD: "200291"
 
+      # TTL máximo de cache (segundos)
+      DNS_SERVER_CACHE_MAX_TTL: "300"
+
+      # TTL mínimo de cache (segundos)
+      DNS_SERVER_CACHE_MIN_TTL: "60"
+
+      # Redes permitidas a usar recursão (segurança)
+      DNS_SERVER_RECURSION_NETWORK_ACL: "10.0.0.0/8,192.168.0.0/16"
+
     volumes:
+      # Persistência da configuração e dados
       - technitium-config:/etc/dns
 
     extra_hosts:
+      # Resolve o segundo node do cluster sem depender do DNS
       - "dns02.cloud.local:10.10.10.26"
 
     healthcheck:
-      test: ["CMD", "dig", "@127.0.0.1", "go.technitium.com", "+short"]
+      # Testa resolução real do DNS interno
+      # test: ["CMD", "dig", "@127.0.0.1", "go.technitium.com", "+short"]
+      test: ["CMD", "dig", "@127.0.0.1", "google.com", "+short"]
+
+      # Intervalo entre checks
       interval: 30s
+
+      # Tempo máximo de resposta
       timeout: 5s
+
+      # Número de falhas antes de marcar como unhealthy
       retries: 3
+
 
 volumes:
   technitium-config:
+    # Nome do volume persistente
     name: technitium-dns01-config

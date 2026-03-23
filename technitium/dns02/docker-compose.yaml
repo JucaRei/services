@@ -1,46 +1,55 @@
-# Docker Compose file for Technitium DNS Server - dns02 - Nanopi R3S
-
 services:
   # ==========================================================
   # Technitium DNS – SECONDARY
   # ==========================================================
   technitium:
+    # Mesma versão do primário (evita incompatibilidade no cluster)
     image: technitium/dns-server:14.3.0
+
+    # Nome do container
     container_name: dns-server-secondary
+
+    # Hostname do node
     hostname: dns02
+
+    # Reinício automático
     restart: unless-stopped
 
     # networks:
     #   dns-net:
     #     ipv4_address: 172.30.0.4
 
-    # Bootstrap DNS
+    # DNS usado pelo próprio container (bootstrap)
     dns:
       - 10.10.10.53 # Unbound externo
       # - 10.10.10.25
       # - 1.1.1.1
 
+    # Sem search domain
     dns_search: []
+
+    # Opções do resolver interno do container
     dns_opt:
       - use-vc
       - ndots:0
       - edns0
 
     ports:
-      # Web UI (não conflita com dns01)
-      - "5380:5380/tcp" # HTTP (ANTES do cluster)
-      - "53443:53443/tcp" # HTTPS (DEPOIS do cluster)
+      # Web UI (mesmas portas do dns01 — OK pois IP é diferente)
+      - "5380:5380/tcp"
+      - "53443:53443/tcp"
 
+      # DNS exposto no IP do host
       - "10.10.10.26:53:53/udp"
       - "10.10.10.26:53:53/tcp"
-      
+
       # DNS LAN
       # NÃO mapear 53 se já estiver bindando no host
       # - "53:53/udp"
       # - "53:53/tcp"
 
     environment:
-      # Identidade
+      # Identidade do servidor
       DNS_SERVER_DOMAIN: "dns02"
 
       # Sem cluster aqui também.
@@ -48,20 +57,45 @@ services:
 
       # Forward para Unbound
       DNS_SERVER_FORWARDERS: "10.10.10.53"
-      DNS_SERVER_FORWARDER_PROTOCOL: "Udp"
 
-      DNS_SERVER_LISTEN_ADDRESSES: "10.10.10.25,::"
+      # Protocolos (igual ao dns01 → consistência)
+      # DNS_SERVER_FORWARDER_PROTOCOL: "Udp"
+      DNS_SERVER_FORWARDER_PROTOCOL: "Udp,Tcp"
+
+      # Escuta correta (⚠️ CORRIGIDO: estava errado no seu arquivo)
+      DNS_SERVER_LISTEN_ADDRESSES: "0.0.0.0,::"
+      # DNS_SERVER_LISTEN_ADDRESSES: "10.10.10.25,::"
+
+      # ⚠️ IMPORTANTE:
+      # Antes estava "Allow" → isso quebra o design (dupla recursão)
+      # Agora igual ao dns01 → usa apenas Unbound
+      DNS_SERVER_RECURSION: "UseForwarders"
+      # DNS_SERVER_RECURSION: "Allow"
 
       # - DNS_SERVER_FORWARDERS=10.10.10.25:5335
       # - DNS_SERVER_FORWARDERS=10.10.10.53:53
       # - DNS_SERVER_FORWARDER_PROTOCOL=Udp
 
-      # Comportamento de resolução
-      DNS_SERVER_RECURSION: "Allow"
+      # Preferência IPv4
       DNS_SERVER_PREFER_IPV4: "true"
+
+      # Timeout (igual ao primário)
+      DNS_SERVER_FORWARDER_TIMEOUT: "2000"
+
+      # Retries (igual ao primário)
+      DNS_SERVER_FORWARDER_RETRIES: "2"
+
+      # Logs desativados
       DNS_SERVER_LOG_QUERIES: "false"
 
-      # Admin
+      # Cache alinhado com dns01 (evita comportamento inconsistente)
+      DNS_SERVER_CACHE_MAX_TTL: "300"
+      DNS_SERVER_CACHE_MIN_TTL: "60"
+
+      # ACL de recursão (segurança)
+      DNS_SERVER_RECURSION_NETWORK_ACL: "10.0.0.0/8,192.168.0.0/16"
+
+      # Senha admin
       DNS_SERVER_ADMIN_PASSWORD: "200291"
 
     volumes:
@@ -74,7 +108,8 @@ services:
       - "dns01.cloud.local:10.10.10.25"
 
     healthcheck:
-      test: ["CMD", "dig", "@127.0.0.1", "go.technitium.com", "+short"]
+      # test: ["CMD", "dig", "@127.0.0.1", "go.technitium.com", "+short"]
+      test: ["CMD", "dig", "@127.0.0.1", "google.com", "+short"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -89,4 +124,3 @@ volumes:
 #     ipam:
 #       config:
 #         - subnet: 172.30.0.0/24
-
