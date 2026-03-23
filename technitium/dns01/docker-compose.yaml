@@ -68,13 +68,13 @@ services:
       DNS_SERVER_LOG_QUERIES: "false"
 
       # Senha do painel admin (ideal mover para .env em produção)
-      DNS_SERVER_ADMIN_PASSWORD: "200291"
+      DNS_SERVER_ADMIN_PASSWORD: "${DNS_ADMIN_PASSWORD}"
 
       # TTL máximo de cache (segundos)
       DNS_SERVER_CACHE_MAX_TTL: "300"
 
       # TTL mínimo de cache (segundos)
-      DNS_SERVER_CACHE_MIN_TTL: "60"
+      DNS_SERVER_CACHE_MIN_TTL: "180"
 
       # Redes permitidas a usar recursão (segurança)
       DNS_SERVER_RECURSION_NETWORK_ACL: "10.0.0.0/8,192.168.0.0/16"
