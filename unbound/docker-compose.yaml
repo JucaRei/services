@@ -9,10 +9,10 @@ services:
       - ./cache/cachedb.d:/usr/local/unbound/cachedb.d/
     command: /bin/sh -c "mkdir -p /run/redis && chown 999:999 /run/redis && chmod 770 /run/redis && tail -f /dev/null"
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 16M
+    #deploy:
+    #  resources:
+    #    limits:
+    #      memory: 16M
 
   unbound-db:
     container_name: unbound-db
@@ -32,10 +32,10 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
-    deploy:
-      resources:
-        limits:
-          memory: 64M
+    #deploy:
+    #  resources:
+    #    limits:
+    #      memory: 64M
 
   unbound:
     container_name: unbound
@@ -86,10 +86,10 @@ services:
       retries: 5
       start_period: 15s
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 200M
+    #deploy:
+    #  resources:
+    #    limits:
+    #      memory: 200M
 
 volumes:
   unbound-db-sock:
