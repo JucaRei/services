@@ -15,8 +15,8 @@ services:
     # privileged: true
     user: "1000:1000"
     volumes:
-      - /mnt/orico/transcodes:/transcode
-      - jellyfin-config:/config
+      - ./transcode:/transcode
+      - ./config:/config
 
       ### HD 500gb
       - /mnt/500gb/Media/Animes:/animes4:ro
