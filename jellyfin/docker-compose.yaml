@@ -3,61 +3,65 @@
 services:
   jellyfin:
     #image: jellyfin/jellyfin:2026011205
-    image: lscr.io/linuxserver/jellyfin:10.11.6
+    image: lscr.io/linuxserver/jellyfin:10.11.8
     container_name: media
     restart: unless-stopped
-    networks:
-      - media
+    # networks:
+    #   - media
     environment:
-      - PUID=1000
-      - PGID=1000
       #- JELLYFIN_PublishedServerUrl=http://localhost:3545
       - TZ=America/Sao_Paulo
       - UMASK_SET=022 #optional
     # privileged: true
+    user: "1000:1000"
     volumes:
-      #- jellyfin-transcode:/config/transcodes
-      # - ./config:/config
+      - /mnt/orico/transcodes:/transcode
       - jellyfin-config:/config
 
+      ### HD 500gb
+      - /mnt/500gb/Media/Animes:/animes4:ro
+      - /mnt/500gb/Media/Movies:/filmes4:ro
+      - /mnt/500gb/Media/TvShows:/series4:ro
+
       ### Orico samba from soyoz
-      - /mnt/orico/Animes:/animes3
-      - /mnt/orico/Filmes:/filmes3
-      - /mnt/orico/Seriados:/series3
+      - /mnt/orico/Animes:/animes3:ro
+      - /mnt/orico/Filmes:/filmes3:ro
+      - /mnt/orico/Seriados:/series3:ro
 
       ### HD 700gb
-      - /mnt/700gb/Animes:/animes
-      - /mnt/700gb/Tvshows:/series
-      - /mnt/700gb/Movies:/filmes
+      - /mnt/700gb/Animes:/animes:ro
+      - /mnt/700gb/Tvshows:/series:ro
+      - /mnt/700gb/Movies:/filmes:ro
 
       ### HD 400gb
-      - /mnt/hd400g/Animes:/animes1
-      - /mnt/hd400g/TvShows:/series1
-      - /mnt/hd400g/Movies:/filmes1
+      - /mnt/hd400g/Animes:/animes1:ro
+      - /mnt/hd400g/TvShows:/series1:ro
+      - /mnt/hd400g/Movies:/filmes1:ro
 
       ### HD 2TB
-      - /mnt/hd2tb/Animes:/animes2
-      - /mnt/hd2tb/Series:/series2
-      - /mnt/hd2tb/Filmes:/filmes2
+      - /mnt/hd2tb/Animes:/animes2:ro
+      - /mnt/hd2tb/Series:/series2:ro
+      - /mnt/hd2tb/Filmes:/filmes2:ro
+      - /mnt/hd2tb/Documentarios:/documentarios2:ro
     devices:
-    ## Intel
+      ## Intel
       - /dev/dri:/dev/dri # For hardware acceleration (optional)
       #- /dev/dri/renderD128:/dev/dri/renderD128 # For hardware acceleration (optional)
       #- /dev/dri/card1:/dev/dri/card1 # For hardware acceleration (optional)
 
-    ## Rockchip
-    #  - /dev/rga:/dev/rga #Specific for RK35XX SoC
-    #  - /dev/dri:/dev/dri
-    #  - /dev/dri/card0:/dev/dri/card0 #Important - device for transcoding
-    #  - /dev/dri/renderD128:/dev/dri/renderD128 #Important, same as above
-    #  - /dev/dma_heap:/dev/dma_heap #Specific for RK35XX SoC
-    #  - /dev/mpp_service:/dev/mpp_service #Specific for RK35XX SoC
-    #  - /dev/mali0:/dev/mali0 # only required to enable OpenCL-accelerated HDR -> SDR tonemapping #Specific for RK35XX SoC
+      ## Rockchip
+      #  - /dev/rga:/dev/rga #Specific for RK35XX SoC
+      #  - /dev/dri:/dev/dri
+      #  - /dev/dri/card0:/dev/dri/card0 #Important - device for transcoding
+      #  - /dev/dri/renderD128:/dev/dri/renderD128 #Important, same as above
+      #  - /dev/dma_heap:/dev/dma_heap #Specific for RK35XX SoC
+      #  - /dev/mpp_service:/dev/mpp_service #Specific for RK35XX SoC
+      #  - /dev/mali0:/dev/mali0 # only required to enable OpenCL-accelerated HDR -> SDR tonemapping #Specific for RK35XX SoC
     ports:
-    - 3545:8096
-    # - 8920:8920 #optional
-    # - 7359:7359/udp #optional
-    # - 1900:1900/udp #optional
+      - 3545:8096
+      # - 8920:8920 #optional
+      # - 7359:7359/udp #optional
+      # - 1900:1900/udp #optional
     group_add:
       - 44 # video group for hardware acceleration (optional)
       - 992 # render group for hardware acceleration (optional)
@@ -67,16 +71,10 @@ services:
 
 volumes:
   jellyfin-config:
-#  jellyfin-transcode:
 
-networks:
-  media:
-    driver: bridge
-    name: media
-
-# docker volume create \
-#  --driver local \
-#  --opt type=tmpfs \
-#  --opt device=tmpfs \
-#  --opt o=size=10g \
-#  jellyfin-transcode
+    # docker volume create \
+    #  --driver local \
+    #  --opt type=tmpfs \
+    #  --opt device=tmpfs \
+    #  --opt o=size=10g \
+    #  jellyfin-transcode
