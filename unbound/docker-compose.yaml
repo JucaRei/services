@@ -40,6 +40,8 @@ services:
   unbound:
     container_name: unbound
     image: madnuttah/unbound:latest
+    # image: madnuttah/unbound:1.24.2-1
+    # image: madnuttah/unbound:1.24.2-2
     depends_on:
       unbound-db:
         condition: service_healthy
