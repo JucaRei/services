@@ -1,20 +1,18 @@
-version: '3.8'
-
 services:
   pyload:
     image: pyload/pyload:latest
     container_name: pyload
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "5555:8000"
     environment:
       - TZ=UTC
       - UMASK=022
     volumes:
       - pyload_config:/home/pyload/.config/pyload
-      - pyload_downloads:/home/pyload/Downloads
+      - /mnt/orico/Downloads:/home/pyload/Downloads
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      test: ["CMD", "curl", "-f", "http://localhost:5555"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -25,8 +23,8 @@ services:
 volumes:
   pyload_config:
     driver: local
-  pyload_downloads:
-    driver: local
+  # pyload_downloads:
+  #   driver: local
 
 networks:
   pyload_network:
