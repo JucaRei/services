@@ -1,18 +1,21 @@
 services:
   pyload:
-    image: pyload/pyload:latest
+    image: linuxserver/pyload-ng:latest
     container_name: pyload
     restart: unless-stopped
     ports:
-      - "5555:8000"
+      - "5000:8000"
+      - "5001:9666"
     environment:
-      - TZ=UTC
+      - TZ=America/Sao_Paulo
       - UMASK=022
+      - PUID=1000
+      - PGID=1000
     volumes:
-      - pyload_config:/home/pyload/.config/pyload
-      - /mnt/orico/Downloads:/home/pyload/Downloads
+      - pyload_config:/config
+      - /mnt/orico/Downloads:/downloads
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5555"]
+      test: ["CMD", "curl", "-f", "http://localhost:5000"]
       interval: 30s
       timeout: 10s
       retries: 3
