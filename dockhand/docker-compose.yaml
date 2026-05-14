@@ -23,7 +23,6 @@ services:
     #   DATABASE_URL: postgres://dockhand:changeme@postgres:5432/dockhand
     # depends_on:
     #   - postgres
-    restart: unless-stopped
 
 volumes:
   dockhand_data:
