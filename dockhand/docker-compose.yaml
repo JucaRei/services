@@ -10,7 +10,7 @@ services:
   #     - postgres_data:/var/lib/postgresql/data
 
   dockhand:
-    image: fnsys/dockhand:latest
+    image: fnsys/dockhand:v1.0.28
     container_name: dockhand
     restart: unless-stopped
     ports:
