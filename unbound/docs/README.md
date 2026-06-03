@@ -625,6 +625,32 @@ sudo chown 999:999 data/unbound/iana.d/root.key
 docker compose restart unbound
 ```
 
+### DNSSEC Falha no Boot (Problema de Relógio/NTP)
+
+Em dispositivos sem bateria de RTC (como o NanoPi R3S), o sistema pode reiniciar com o relógio atrasado. Como a validação DNSSEC exige o relógio correto, o Unbound falhará ao resolver nomes, impedindo que o próprio NTP do host resolva os nomes dos servidores de hora para sincronizar o relógio (um problema clássico de dependência mútua).
+
+**Resolução Temporária**:
+1. No host (FriendlyWrt / NanoPi), ajuste o relógio manualmente:
+   ```bash
+   date -s "YYYY-MM-DD HH:MM:SS"
+   ```
+2. No container/LXC, reinicie o Unbound:
+   ```bash
+   cd ~/workspace/services/unbound
+   docker compose restart unbound
+   ```
+
+**Resolução Definitiva**:
+Configure o NTP do OpenWRT/FriendlyWrt para sincronizar usando endereços IP diretos de servidores NTP:
+```bash
+uci add_list system.ntp.server='200.160.7.186'   # a.st1.ntp.br
+uci add_list system.ntp.server='200.189.40.8'    # c.st1.ntp.br
+uci add_list system.ntp.server='162.159.200.1'   # time.cloudflare.com
+uci commit system
+/etc/init.d/sysntpd restart
+```
+
+
 ### Redis não conecta
 
 ```bash

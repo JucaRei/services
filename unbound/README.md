@@ -16,6 +16,7 @@ DNS recursivo leve com validação DNSSEC e cache persistente em Redis. Otimizad
 8. [Configuração do Redis](#-configuração-do-redis)
 9. [Inicialização e Controle](#-inicialização-e-controle)
 10. [Integração com OpenWRT](#-integração-com-openwrt)
+11. [Solução de Problemas](#-solução-de-problemas)
 
 ---
 
@@ -250,7 +251,7 @@ ip="$(drill -Q -p $HEALTHCHECK_PORT $EXTENDED_HEALTHCHECK_DOMAIN @127.0.0.1)" &>
 
 if [ $? -ne 0 ]; then
   echo "Warning: Domain '$EXTENDED_HEALTHCHECK_DOMAIN' not resolved"
-  exit 1 
+  exit 1
 else
   echo "Domain '$EXTENDED_HEALTHCHECK_DOMAIN' resolved to '$ip'"
   exit 0
@@ -397,7 +398,33 @@ uci set firewall.@rule[-1].src='lan'
 uci set firewall.@rule[-1].dest_ip='10.10.10.53'
 uci set firewall.@rule[-1].proto='tcp udp'
 uci set firewall.@rule[-1].dest_port='53'
-uci set firewall.@rule[-1].target='ACCEPT'
-uci commit firewall
-/etc/init.d/firewall restart
+```
+
+---
+
+## 🛠️ Solução de Problemas
+
+### DNSSEC Falha no Boot (Problema de Relógio/NTP)
+
+Em dispositivos sem bateria de RTC (como o NanoPi R3S), o sistema pode reiniciar com o relógio atrasado. Como a validação DNSSEC exige o relógio correto, o Unbound falhará ao resolver nomes, impedindo que o próprio NTP do host resolva os nomes dos servidores de hora para sincronizar o relógio (um problema clássico de dependência mútua).
+
+**Resolução Temporária**:
+1. No host (FriendlyWrt / NanoPi), ajuste o relógio manualmente via SSH:
+   ```bash
+   date -s "YYYY-MM-DD HH:MM:SS"
+   ```
+2. No container/LXC, navegue até a pasta correspondente e reinicie o Unbound:
+   ```bash
+   cd ~/workspace/services/unbound
+   docker compose restart unbound
+   ```
+
+**Resolução Definitiva**:
+Configure o NTP do OpenWRT/FriendlyWrt para sincronizar usando endereços IP diretos de servidores NTP públicos, contornando a necessidade de DNS no boot:
+```bash
+uci add_list system.ntp.server='200.160.7.186'   # a.st1.ntp.br
+uci add_list system.ntp.server='200.189.40.8'    # c.st1.ntp.br
+uci add_list system.ntp.server='162.159.200.1'   # time.cloudflare.com
+uci commit system
+/etc/init.d/sysntpd restart
 ```
