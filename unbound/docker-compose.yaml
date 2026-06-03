@@ -1,6 +1,12 @@
-# Docker Compose file for Unbound DNS with Redis cache backend - Nanopi R3S
+# ==============================================================================
+# Docker Compose - Unbound + Redis DNS recursivo com cache persistente
+# Otimizado para NanoPi R3S (Debian Trixie / OpenWRT) rodando sob LXC unprivileged
+# ==============================================================================
 
 services:
+  # Container de suporte para gerenciar a criação do UNIX socket do Redis.
+  # Em containers distroless/non-root executados no LXC unprivileged, compartilhar
+  # sockets em disco exige uma pasta intermediária com permissões UID/GID rígidas (999).
   unbound-db-socket:
     container_name: unbound-db-socket
     image: busybox:latest
@@ -9,11 +15,13 @@ services:
       - ./cache/cachedb.d:/usr/local/unbound/cachedb.d/
     command: /bin/sh -c "mkdir -p /run/redis && chown 999:999 /run/redis && chmod 770 /run/redis && tail -f /dev/null"
     restart: unless-stopped
+    # Otimização opcional de limite de RAM para o Nanopi R3S
     #deploy:
     #  resources:
     #    limits:
     #      memory: 16M
 
+  # Banco Redis atuando estritamente em memória com cache persistente via Unix Socket.
   unbound-db:
     container_name: unbound-db
     image: redis:alpine
@@ -37,47 +45,57 @@ services:
     #    limits:
     #      memory: 64M
 
+  # Serviço Unbound DNS Recursivo
   unbound:
     container_name: unbound
-    image: madnuttah/unbound:latest
+    # Pinned Version: Utilização de tag fixa para consistência e estabilidade da imagem.
+    # Evita que atualizações automáticas silenciosas quebrem a estrutura do cluster.
+    image: madnuttah/unbound:1.24.2-2
     # image: madnuttah/unbound:1.24.2-1
-    # image: madnuttah/unbound:1.24.2-2
+    # image: madnuttah/unbound:latest # Evitado para prevenir quebra de configurações
     depends_on:
       unbound-db:
         condition: service_healthy
     volumes_from:
       - unbound-db-socket
     volumes:
+      # Montagens de volumes de configuração e zonas
       - ./data/unbound/unbound.conf:/usr/local/unbound/unbound.conf:rw
       - ./data/unbound/conf.d:/usr/local/unbound/conf.d/:rw
-      # - ./data/unbound/log.d/unbound.log:/usr/local/unbound/log.d/unbound.log:rw
-      # - ./data/unbound/log.d/unbound-stats.log:/usr/local/unbound/log.d/unbound-stats.log:rw
+      
+      # Mapeamento do diretório de log. A escrita direta em arquivo dentro do container
+      # foi desativada no 'logging.conf', direcionando os logs para o stdout do Docker.
       - ./data/unbound/log.d:/usr/local/unbound/log.d/:rw
       - ./data/unbound/log.d/unbound-stats.log:/usr/local/unbound/log.d/unbound-stats.log:rw
-      # - ./data/unbound/iana.d:/usr/local/unbound/iana.d/:rw
       - ./data/unbound/zones.d:/usr/local/unbound/zones.d/:rw
-      - ./data/unbound/healthcheck.sh:/usr/local/unbound/sbin/healthcheck.sh:rw # ro
-      # - ./data/unbound/root.hints:/usr/local/unbound/root.hints:ro
-      # - ./data/unbound/root.key:/usr/local/unbound/root.key:rw
-      # - cachedb.d:/usr/local/unbound/cachedb.d/ # Para cache Redis persistente
-      - ./cache/cachedb.d:/usr/local/unbound/cachedb.d/ # Para cache Redis persistente
+      
+      # Script customizado de checagem de integridade (healthcheck)
+      - ./data/unbound/healthcheck.sh:/usr/local/unbound/sbin/healthcheck.sh:rw 
+      - ./cache/cachedb.d:/usr/local/unbound/cachedb.d/ 
+      
+      # Chaves de controle remoto. ATENÇÃO: Devem ser geradas no host caso ative o remote-control.
       - ./data/unbound/control-keys:/usr/local/unbound/control-keys:ro
-      - unbound-pid:/var/run  # Volume for PID file
+      - unbound-pid:/var/run
     ports:
-    #   # - "10.10.10.53:53:53/tcp"
-    #   # - "10.10.10.53:53:53/udp"
+      # Portas de atendimento de DNS expostas no host do LXC (10.10.10.53).
       - "53:53/tcp"
       - "53:53/udp"
-    #network_mode: host
+    
+    # Adiciona capacidade do kernel para escutar em portas baixas (<1024) rodando como non-root
     cap_add:
       - NET_BIND_SERVICE
     environment:
       TZ: America/Sao_Paulo
-      # Remove all user-related environment variables:
-      # DISABLE_SET_PERMS: 1
+      
+      # DISABLE_SET_PERMS: Evita que a imagem distroless do Unbound tente reescrever permissões
+      # das pastas no host. Muito importante para evitar falhas em LXC Unprivileged.
       DISABLE_SET_PERMS: "true"
+      
+      # IDs do usuário/grupo internos do container (madnuttah por padrão roda com UID 999).
       UNBOUND_UID: 999
       UNBOUND_GID: 999
+      
+      # Porta do healthcheck interno e verificação ativa do DNS (NLnet Labs drill)
       HEALTHCHECK_PORT: 53
       EXTENDED_HEALTHCHECK: true
       ENABLE_STATS: true
@@ -95,9 +113,4 @@ services:
 
 volumes:
   unbound-db-sock:
-  # redis-data:
-  # cachedb.d:
   unbound-pid:
-
-# mkdir -pv data/unbound/{conf.d,iana.d,zones.d,log.d}
-# mkdir -pv data/redis
