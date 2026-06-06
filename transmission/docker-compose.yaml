@@ -47,6 +47,7 @@ services:
       - /mnt/hd400g/Read/Mangas:/mangas1
       - /mnt/hd400g/Read/Books:/books1
       - /mnt/hd400g/Read/Comics:/comics1
+      - /mnt/hd400g/Courses:/cursos1
 
       ### HD 2TB
       - /mnt/hd2tb/Filmes:/filmes2
