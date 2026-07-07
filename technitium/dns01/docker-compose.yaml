@@ -2,7 +2,7 @@ services:
   technitium:
     # Imagem fixa (evita mudanças inesperadas em updates)
     # image: technitium/dns-server:14.3.0
-    image: technitium/dns-server:15.2.0
+    image: technitium/dns-server:15.3.0
 
     # Nome do container (facilita debug/logs)
     container_name: dns01

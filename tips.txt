@@ -19,3 +19,9 @@ XZ_OPT=-9 tar -cJvf dns02.tar.xz \
     --exclude=/opt/lxc/dns02/rootfs/tmp \
     --exclude=/opt/lxc/dns02/rootfs/var/cache \
     /opt/lxc/dns02
+
+# Rsync to another machine
+
+rsync -aHAX --numeric-ids \
+/opt/lxc/unbound \
+juca@10.10.10.2:/home/juca/workspace/backups/lxc_containers/unbound
