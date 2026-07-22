@@ -5,7 +5,7 @@ services:
   technitium:
     # Mesma versão do primário (evita incompatibilidade no cluster)
     # image: technitium/dns-server:14.3.0
-    image: technitium/dns-server:15.3.0
+    image: technitium/dns-server:15.4.0
 
     # Nome do container
     container_name: dns-server-secondary
@@ -39,6 +39,9 @@ services:
       # Web UI (mesmas portas do dns01 — OK pois IP é diferente)
       - "5380:5380/tcp"
       - "53443:53443/tcp"
+      - "853:853/tcp"
+      - "853:853/udp"
+      - "443:443/udp"
 
       # DNS exposto no IP do host
       - "10.10.10.26:53:53/udp"
