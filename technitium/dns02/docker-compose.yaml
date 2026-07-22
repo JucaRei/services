@@ -118,6 +118,9 @@ services:
       timeout: 5s
       retries: 3
 
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 65535 # remove when using "host" network mode
+
 volumes:
   technitium-dns02-config:
     name: technitium-dns02-config
