@@ -2,13 +2,14 @@ config dnsmasq
         option domainneeded '1'
         option boguspriv '1'
         option localise_queries '1'
-        // # option rebind_protection '0'
-        option rebind_protection '1'    // # Ativar proteção contra rebind (segurança)
+        # option rebind_protection '0'
+        option rebind_protection '1'    # Ativar proteção contra rebind (segurança)
         option local '/lan/'
         option domain 'lan'
         option expandhosts '1'
         option authoritative '1'
         option noresolv '1'
+        option strict_order '1'         # Consulta servidores na ordem estrita (primário antes do secundário)
         list server '10.10.10.25'
         list server '10.10.10.26'
         list server '8.8.8.8'
@@ -16,8 +17,8 @@ config dnsmasq
         list server '/cache.nixos.org/8.8.8.8'
         list server '/cache.nixos.org/1.1.1.1'
         option cachesize '1000'
-        // option dnssec '0'  
-        option dnssec '1'   // # Ativar DNSSEC para validação de DNS
+        # option dnssec '0'  
+        option dnssec '1'   # Ativar DNSSEC para validação de DNS
         option ednspacket_max '1232'
 
 config dhcp 'lan'

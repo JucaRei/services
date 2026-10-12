@@ -138,13 +138,13 @@ config rule
         option target 'REJECT'
         option enabled '0'
 
-// # config rule
-// #        option name 'Block-External-DNS'
-// #        option src 'lan'
-// #        option proto 'tcp udp'
-// #        option dest_port '53'
-// #        option target 'REJECT'
-// #        option enabled '0'
+# config rule
+#        option name 'Block-External-DNS'
+#        option src 'lan'
+#        option proto 'tcp udp'
+#        option dest_port '53'
+#        option target 'REJECT'
+#        option enabled '0'
 
 config rule
         option name 'Allow-DNS-Technitium-25'

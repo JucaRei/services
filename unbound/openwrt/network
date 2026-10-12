@@ -42,3 +42,4 @@ config interface 'lan'
         option peerdns '0'
         list dns '10.10.10.25'
         list dns '10.10.10.26'
+        list dns '1.1.1.1'              # Fallback seguro para o OpenWrt caso os containers LXC estejam offline no boot

@@ -1,0 +1,25 @@
+# ==============================================================================
+# OpenWRT / FriendlyWrt - Configuração do Sistema e NTP
+# Otimizado para NanoPi R3S (sem bateria RTC)
+# ==============================================================================
+
+config system
+        option hostname 'OpenWrt'
+        option timezone '<-03>3'
+        option zonename 'America/Sao_Paulo'
+        option ttylogin '0'
+        option log_size '64'
+        option urandom_seed '0'
+
+config timeserver 'ntp'
+        option enabled '1'
+        option enable_server '0'
+        # Servidores por nome (padrão)
+        list server '0.openwrt.pool.ntp.org'
+        list server '1.openwrt.pool.ntp.org'
+        list server '2.openwrt.pool.ntp.org'
+        list server '3.openwrt.pool.ntp.org'
+        # IPs diretos: CRÍTICO para o NanoPi R3S sincronizar relógio no boot sem depender de DNS prévio
+        list server '200.160.7.186'     # a.st1.ntp.br (NTP.br Brasil)
+        list server '200.189.40.8'      # c.st1.ntp.br (NTP.br Brasil)
+        list server '162.159.200.1'     # time.cloudflare.com (Cloudflare Anycast)
