@@ -121,6 +121,7 @@ config rule
         option dest 'lan'
         option proto 'esp'
         option target 'ACCEPT'
+        option enabled '0'              # Desativado por segurança (não há servidor IPSec exposto na LAN)
 
 config rule
         option name 'Allow-ISAKMP'
@@ -129,6 +130,7 @@ config rule
         option dest_port '500'
         option proto 'udp'
         option target 'ACCEPT'
+        option enabled '0'              # Desativado por segurança
 
 config rule
         option name 'Reject-IPv6'
@@ -145,6 +147,9 @@ config ipset
         list entry '10.10.10.26'
         list entry '10.10.10.53'
 
+# ------------------------------------------------------------------------------
+# CONTROLE DE DNS TRADICIONAL (PORTA 53)
+# ------------------------------------------------------------------------------
 config rule
         option name 'Allow-DNS-Servers-Outbound'
         option src 'lan'
@@ -162,6 +167,29 @@ config rule
         option dest_port '53'
         option target 'REJECT'
 
+# ------------------------------------------------------------------------------
+# CONTROLE DE DNS-OVER-TLS / DoT (PORTA 853 - Impede "DNS Privado" do Android/iOS)
+# ------------------------------------------------------------------------------
+config rule
+        option name 'Allow-DoT-Servers'
+        option src 'lan'
+        option dest 'wan'
+        option proto 'tcp udp'
+        option dest_port '853'
+        option ipset 'dns_servers'
+        option target 'ACCEPT'
+
+config rule
+        option name 'Block-Rogue-DoT'
+        option src 'lan'
+        option dest 'wan'
+        option proto 'tcp udp'
+        option dest_port '853'
+        option target 'REJECT'
+
+# ------------------------------------------------------------------------------
+# REGRAS DE ACESSO LOCAL AOS SERVIDORES TECHNITIUM NA LAN
+# ------------------------------------------------------------------------------
 config rule
         option name 'Allow-DNS-Technitium-25'
         option src 'lan'
@@ -169,6 +197,7 @@ config rule
         option proto 'tcp udp'
         option dest_port '53'
         option target 'ACCEPT'
+        option enabled '1'
 
 config rule
         option name 'Allow-DNS-Tewchnitium-26'
@@ -177,3 +206,4 @@ config rule
         option proto 'tcp udp'
         option dest_port '53'
         option target 'ACCEPT'
+        option enabled '1'

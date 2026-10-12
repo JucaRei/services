@@ -102,6 +102,9 @@ services:
       # Senha admin
       DNS_SERVER_ADMIN_PASSWORD: "${DNS_ADMIN_PASSWORD}"
 
+      # Mantém estatísticas na RAM, poupando a vida útil do cartão SD/eMMC:
+      DNS_SERVER_STATS_ENABLE_IN_MEMORY_STATS: "true"
+
     volumes:
       # - ./technitium-config:/etc/dns
       - technitium-dns02-config:/etc/dns
