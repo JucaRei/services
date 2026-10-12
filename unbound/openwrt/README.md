@@ -16,6 +16,7 @@ Repositório de backup comentado e documentado de todas as configurações do ro
 | [**`lxc-auto`**](lxc-auto) | Inicialização automática dos containers no boot | `autostart '1'` nos containers `dns01`, `dns02` e `unbound` |
 | [**`dropbear`**](dropbear) | Servidor de acesso remoto SSH | Porta 22, autenticação segura com chave ou senha |
 | [**`uhttpd`**](uhttpd) | Servidor Web da interface gráfica LuCI | Portas 80/443, certificado TLS em Curva Elíptica (P-256), proteção RFC1918 |
+| [**`sqm`**](sqm) | Controle de Fila / Bufferbloat (CAKE) | Otimizado para 150M Down / 41M Up PPPoE, ping estável sob carga máxima |
 
 ---
 

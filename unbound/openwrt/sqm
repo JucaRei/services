@@ -1,0 +1,38 @@
+# ==============================================================================
+# OpenWRT / FriendlyWrt - SQM QoS (Smart Queue Management com CAKE)
+# Otimizado para NanoPi R3S (RK3568) - Conexão PPPoE: 150M Down / 41M Up
+# Localização no roteador: /etc/config/sqm
+# ==============================================================================
+
+config queue 'wan'
+        # Habilita o gerenciamento inteligente de filas:
+        option enabled '1'
+
+        # Interface física/lógica do PPPoE:
+        option interface 'pppoe-wan'
+
+        # Velocidade de Download configurada em kbps:
+        # 150 Mbps contratados -> ~93% = 140000 kbps (140 Mbps)
+        # O CAKE precisa dessa margem para manter o ping baixo durante downloads pesados
+        option download '140000'
+
+        # Velocidade de Upload configurada em kbps:
+        # 41 Mbps contratados -> ~92% = 38000 kbps (38 Mbps)
+        # Evita que uploads (vídeos, backups, torrents) saturem a latência da casa
+        option upload '38000'
+
+        # Algoritmo de gerenciamento de fila: CAKE (o melhor e mais moderno do Linux)
+        option qdisc 'cake'
+
+        # Script de regras recomendado:
+        option script 'piece_of_cake.qos'
+
+        # Camada de enlace (Ethernet sobre Fibra/FTTH):
+        option linklayer 'ethernet'
+
+        # Compensação de Overhead para encapsulamento PPPoE (44 bytes padrão):
+        option overhead '44'
+
+        # Desativa logs excessivos no sistema:
+        option verbosity '0'
+        option debug_logging '0'
