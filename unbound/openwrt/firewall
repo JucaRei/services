@@ -1,34 +1,96 @@
+# ==============================================================================
+# OpenWRT / FriendlyWrt 24.10 - Configuração do Firewall (Firewall4 / nftables)
+# Localização no roteador: /etc/config/firewall
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. POLÍTICAS GLOBAIS PADRÃO DO FIREWALL
+# ------------------------------------------------------------------------------
 config defaults
+        # Tráfego destinado ao roteador: Aceito por padrão
         option input 'ACCEPT'
+
+        # Tráfego originado pelo roteador: Aceito por padrão
         option output 'ACCEPT'
+
+        # Tráfego passando pelo roteador (roteamento): Aceito por padrão
         option forward 'ACCEPT'
+
+        # Software Flow Offloading:
+        # Acelera drasticamente o roteamento de pacotes reduzindo o uso da CPU para quase 0%
         option flow_offloading '1'
+
+        # Proteção contra ataques SYN Flood (ataques de negação de serviço DoS):
         option synflood_protect '1'
+
+        # Descarta silenciosamente pacotes corrompidos, fora de ordem ou inválidos:
         option drop_invalid '1'
 
+
+# ------------------------------------------------------------------------------
+# 2. ZONA LAN (Rede Local Confiável - Computadores, Celulares, LXC Containers)
+# ------------------------------------------------------------------------------
 config zone
         option name 'lan'
         list network 'lan'
+
+        # Permite que dispositivos da rede local acessem os serviços do roteador (DNS, DHCP, LuCI):
         option input 'ACCEPT'
+
+        # Permite que o roteador responda para os clientes da LAN:
         option output 'ACCEPT'
+
+        # Permite que dispositivos da LAN conversem entre si:
         option forward 'ACCEPT'
 
+
+# ------------------------------------------------------------------------------
+# 3. ZONA WAN (Internet Pública - PPPoE / Provedor)
+# ------------------------------------------------------------------------------
 config zone
         option name 'wan'
         list network 'wan'
         list network 'wan6'
-        option input 'REJECT'
+
+        # INPUT DROP (Modo Furtivo / Stealth Mode):
+        # Descarta no lixo silenciosamente qualquer pacote vindo da internet sem responder.
+        # Scanners de portas (Nmap/Shodan/Botnets) não conseguem sequer saber se o IP existe!
+        option input 'DROP'
+
+        # Permite que o roteador faça conexões de saída para a internet:
         option output 'ACCEPT'
-        option forward 'REJECT'
+
+        # FORWARD DROP:
+        # Impede que invasores na internet iniciem conexões não solicitadas para seus PCs/LXC:
+        option forward 'DROP'
+
+        # Full-Cone NAT (IPv4 e IPv6):
+        # Melhora conexões P2P, jogos online (NAT Tipo Aberto / NAT Type A) e chamadas VoIP:
         option fullcone4 '1'
         option fullcone6 '1'
+
+        # Masquerading (NAT): Traduz os IPs privados (10.10.10.x) para o IP público da sua WAN:
         option masq '1'
+
+        # MSS Clamping (MTU Fix):
+        # Ajusta automaticamente o tamanho dos pacotes TCP para evitar fragmentação em PPPoE:
         option mtu_fix '1'
 
+
+# ------------------------------------------------------------------------------
+# 4. ENCAMINHAMENTO DE TRÁFEGO (FORWARDING: LAN -> WAN)
+# ------------------------------------------------------------------------------
 config forwarding
+        # Permite que os dispositivos da rede local naveguem para a internet:
         option src 'lan'
         option dest 'wan'
 
+
+# ------------------------------------------------------------------------------
+# 5. REGRAS BÁSICAS DE CONECTIVIDADE DA OPERADORA / PROVEDOR (WAN)
+# ------------------------------------------------------------------------------
+
+# Permite que o roteador renove o endereço IP com o provedor via DHCP (Porta UDP 68):
 config rule
         option name 'Allow-DHCP-Renew'
         option src 'wan'
@@ -37,6 +99,7 @@ config rule
         option target 'ACCEPT'
         option family 'ipv4'
 
+# Permite que a operadora ou testes de ping externos recebam resposta ICMP (Ping):
 config rule
         option name 'Allow-Ping'
         option src 'wan'
@@ -45,6 +108,7 @@ config rule
         option family 'ipv4'
         option target 'ACCEPT'
 
+# Permite tráfego Multicast IGMP (necessário caso utilize serviços de IPTV da operadora):
 config rule
         option name 'Allow-IGMP'
         option src 'wan'
@@ -52,6 +116,7 @@ config rule
         option family 'ipv4'
         option target 'ACCEPT'
 
+# Permite que o roteador receba prefixo e endereço IPv6 da operadora via DHCPv6 (Porta UDP 546):
 config rule
         option name 'Allow-DHCPv6'
         option src 'wan'
@@ -60,6 +125,7 @@ config rule
         option family 'ipv6'
         option target 'ACCEPT'
 
+# MLD (Multicast Listener Discovery): Gerencia grupos de multicast no protocolo IPv6:
 config rule
         option name 'Allow-MLD'
         option src 'wan'
@@ -72,6 +138,8 @@ config rule
         option family 'ipv6'
         option target 'ACCEPT'
 
+# Pacotes essenciais de controle do IPv6 destinados ao próprio roteador:
+# (Neighbor Discovery, Descoberta de MTU, etc. - Sem isso, o IPv6 quebra):
 config rule
         option name 'Allow-ICMPv6-Input'
         option src 'wan'
@@ -91,14 +159,7 @@ config rule
         option family 'ipv6'
         option target 'ACCEPT'
 
-config rule
-        option name 'Allow-DNS-Unbound'
-        option src 'lan'
-        option dest_ip '10.10.10.53'
-        option proto 'tcp udp'
-        option dest_port '53'
-        option target 'ACCEPT'
-
+# Pacotes essenciais de controle do IPv6 repassados para os dispositivos da rede local:
 config rule
         option name 'Allow-ICMPv6-Forward'
         option src 'wan'
@@ -115,14 +176,21 @@ config rule
         option family 'ipv6'
         option target 'ACCEPT'
 
+
+# ------------------------------------------------------------------------------
+# 6. REGRAS ANTIGAS / DESATIVADAS POR SEGURANÇA
+# ------------------------------------------------------------------------------
+
+# Desativado: Não permitir tráfego IPSec ESP vindo direto da internet para a LAN sem VPN ativa:
 config rule
         option name 'Allow-IPSec-ESP'
         option src 'wan'
         option dest 'lan'
         option proto 'esp'
         option target 'ACCEPT'
-        option enabled '0'              # Desativado por segurança (não há servidor IPSec exposto na LAN)
+        option enabled '0'
 
+# Desativado: Não expor porta UDP 500 (ISAKMP) da WAN para a LAN:
 config rule
         option name 'Allow-ISAKMP'
         option src 'wan'
@@ -130,8 +198,9 @@ config rule
         option dest_port '500'
         option proto 'udp'
         option target 'ACCEPT'
-        option enabled '0'              # Desativado por segurança
+        option enabled '0'
 
+# Regra legada de bloqueio IPv6 (desativada pois o IPv6 está operacional):
 config rule
         option name 'Reject-IPv6'
         option family 'ipv6'
@@ -140,16 +209,24 @@ config rule
         option target 'REJECT'
         option enabled '0'
 
+
+# ------------------------------------------------------------------------------
+# 7. BLINDAGEM DE DNS (PROTEÇÃO CONTRA VAZAMENTO E BURLA DO TECHNITIUM)
+# ------------------------------------------------------------------------------
+
+# IPSET (Grupo de IPs Autorizados):
+# Define quem são os únicos servidores de DNS legítimos da sua rede:
 config ipset
         option name 'dns_servers'
         option match 'src_ip'
-        list entry '10.10.10.25'
-        list entry '10.10.10.26'
-        list entry '10.10.10.53'
+        list entry '10.10.10.25'        # Technitium DNS Primário (dns01)
+        list entry '10.10.10.26'        # Technitium DNS Secundário (dns02)
+        list entry '10.10.10.53'        # Unbound Recursivo
 
-# ------------------------------------------------------------------------------
-# CONTROLE DE DNS TRADICIONAL (PORTA 53)
-# ------------------------------------------------------------------------------
+
+# --- CONTROLE DE DNS TRADICIONAL (PORTA 53) ---
+
+# Permite que APENAS seus servidores autorizados consultem DNS para fora na internet:
 config rule
         option name 'Allow-DNS-Servers-Outbound'
         option src 'lan'
@@ -159,6 +236,8 @@ config rule
         option ipset 'dns_servers'
         option target 'ACCEPT'
 
+# Bloqueia qualquer outro dispositivo da rede tentando consultar DNS direto na WAN:
+# (Força Smart TVs, Chromecast e Fire TV a usarem o Technitium via DHCP):
 config rule
         option name 'Block-Rogue-DNS'
         option src 'lan'
@@ -167,9 +246,10 @@ config rule
         option dest_port '53'
         option target 'REJECT'
 
-# ------------------------------------------------------------------------------
-# CONTROLE DE DNS-OVER-TLS / DoT (PORTA 853 - Impede "DNS Privado" do Android/iOS)
-# ------------------------------------------------------------------------------
+
+# --- CONTROLE DE DNS-OVER-TLS / DoT (PORTA 853) ---
+
+# Permite DoT na internet apenas para seus servidores de DNS autorizados:
 config rule
         option name 'Allow-DoT-Servers'
         option src 'lan'
@@ -179,6 +259,8 @@ config rule
         option ipset 'dns_servers'
         option target 'ACCEPT'
 
+# Bloqueia a porta 853 para celulares e computadores:
+# (Impede que o recurso "DNS Privado" do Android/iOS burle o bloqueador de anúncios):
 config rule
         option name 'Block-Rogue-DoT'
         option src 'lan'
@@ -187,9 +269,21 @@ config rule
         option dest_port '853'
         option target 'REJECT'
 
+
 # ------------------------------------------------------------------------------
-# REGRAS DE ACESSO LOCAL AOS SERVIDORES TECHNITIUM NA LAN
+# 8. PERMISSÕES DE ACESSO AOS SERVIDORES DNS LOCAIS NA LAN
 # ------------------------------------------------------------------------------
+
+# Permite que todos os clientes da rede local consultem o Unbound (10.10.10.53:53):
+config rule
+        option name 'Allow-DNS-Unbound'
+        option src 'lan'
+        option dest_ip '10.10.10.53'
+        option proto 'tcp udp'
+        option dest_port '53'
+        option target 'ACCEPT'
+
+# Permite que todos os clientes da rede local consultem o Technitium dns01 (10.10.10.25:53):
 config rule
         option name 'Allow-DNS-Technitium-25'
         option src 'lan'
@@ -199,6 +293,7 @@ config rule
         option target 'ACCEPT'
         option enabled '1'
 
+# Permite que todos os clientes da rede local consultem o Technitium dns02 (10.10.10.26:53):
 config rule
         option name 'Allow-DNS-Tewchnitium-26'
         option src 'lan'
