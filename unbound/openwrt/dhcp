@@ -31,6 +31,7 @@ config dhcp 'lan'
         option ra 'server'
         list ra_flags 'managed-config'
         list ra_flags 'other-config'
+        option dns_service '0'          # Não anuncia DNS via IPv6 RDNSS (obriga uso do Technitium IPv4)
         list dhcp_option '6,10.10.10.25'
         list dhcp_option '6,10.10.10.26'
 

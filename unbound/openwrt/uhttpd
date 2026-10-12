@@ -1,0 +1,57 @@
+# ==============================================================================
+# OpenWRT / FriendlyWrt - Servidor Web da Interface LuCI (uHTTPd)
+# Localização: /etc/config/uhttpd
+# ==============================================================================
+
+config uhttpd 'main'
+        # Portas HTTP (Porta 80 em IPv4 e IPv6):
+        list listen_http '0.0.0.0:80'
+        list listen_http '[::]:80'
+
+        # Portas HTTPS com certificado TLS (Porta 443 em IPv4 e IPv6):
+        list listen_https '0.0.0.0:443'
+        list listen_https '[::]:443'
+
+        # Redirecionamento automático de HTTP para HTTPS (0 = desativado, 1 = ativado):
+        # Mude para '1' se preferir forçar conexão segura HTTPS na interface LuCI
+        option redirect_https '0'
+
+        # Diretório raiz dos arquivos web:
+        option home '/www'
+
+        # Proteção contra ataques de DNS Rebinding em redes privadas (RFC1918):
+        option rfc1918_filter '1'
+
+        # Limite de requisições simultâneas por conexão:
+        option max_requests '3'
+
+        # Limite de conexões ativas simultâneas:
+        option max_connections '100'
+
+        # Caminho do certificado e chave privada SSL/TLS auto-assinados:
+        option cert '/etc/uhttpd.crt'
+        option key '/etc/uhttpd.key'
+
+        # Prefixo de scripts CGI e integração com o interpretador Lua do LuCI:
+        option cgi_prefix '/cgi-bin'
+        list lua_prefix '/cgi-bin/luci=/usr/lib/lua/luci/sgi/uhttpd.lua'
+
+        # Timeouts de execução e rede (em segundos):
+        option script_timeout '180'
+        option network_timeout '30'
+        option http_keepalive '20'
+        option tcp_keepalive '1'
+
+        # Caminho da API ubus do OpenWrt:
+        option ubus_prefix '/ubus'
+
+# Parâmetros para geração do certificado auto-assinado padrão:
+config cert 'defaults'
+        option days '397'
+        option key_type 'ec'            # Curva Elíptica (mais leve para o hardware que RSA)
+        option bits '2048'
+        option ec_curve 'P-256'
+        option country 'ZZ'
+        option state 'Somewhere'
+        option location 'Unknown'
+        option commonname 'OpenWrt'

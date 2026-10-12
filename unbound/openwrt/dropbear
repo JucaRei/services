@@ -1,0 +1,25 @@
+# ==============================================================================
+# OpenWRT / FriendlyWrt - Configuração do Servidor SSH (Dropbear)
+# Localização: /etc/config/dropbear
+# ==============================================================================
+
+config dropbear 'main'
+        # Habilita o serviço SSH
+        option enable '1'
+
+        # Porta padrão do SSH (22):
+        option Port '22'
+
+        # Permite autenticação por senha para usuários normais
+        option PasswordAuth 'on'
+
+        # Permite login do usuário root com senha
+        # RECOMENDAÇÃO DE SEGURANÇA: Após configurar chave pública SSH (~/.ssh/authorized_keys),
+        # você pode alterar esta opção para 'off' para impedir ataques de força bruta.
+        option RootPasswordAuth 'on'
+
+        # Permite login apenas por interfaces específicas (descomente para restringir à LAN):
+        # option Interface 'lan'
+
+        # Arquivo de banner exibido antes do login (opcional):
+        # option BannerFile '/etc/banner'

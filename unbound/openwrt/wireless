@@ -1,0 +1,126 @@
+# ==============================================================================
+# OpenWRT / FriendlyWrt - Configuração Wi-Fi (Wireless)
+# Roteador: NanoPi R3S com Adaptadores Wi-Fi USB (Comfast / Edup)
+# Localização: /etc/config/wireless
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# DISPOSITIVO DE RÁDIO 0: 5GHz (Adaptador USB Comfast - Ex: mt7612u / rtl8812au)
+# ------------------------------------------------------------------------------
+config wifi-device 'radio0'
+        option type 'mac80211'
+        # Caminho físico do barramento USB no NanoPi R3S:
+        option path 'platform/usbhost/fd000000.usb/xhci-hcd.0.auto/usb2/2-1/2-1.1/2-1.1:1.0'
+        # Faixa de frequência: 5GHz
+        option band '5g'
+        # Canal 153 (Faixa UNII-3: 149-165): Excelente escolha no Brasil (não usa DFS, sem interrupção de radar)
+        option channel '153'
+        # Largura de canal VHT80 (80MHz no padrão Wi-Fi 5 / 802.11ac - até 867 Mbps):
+        option htmode 'VHT80'
+        # Código do país (define potências e canais permitidos pela ANATEL):
+        option country 'BR'
+        # Potência de transmissão em dBm (20 dBm = 100mW):
+        option txpower '20'
+        # Densidade de células (0 = normal/automático):
+        option cell_density '0'
+
+# ------------------------------------------------------------------------------
+# DISPOSITIVO DE RÁDIO 1: 2.4GHz Wi-Fi 6 (Adaptador USB Edup - Ex: mt7921u / rtl8832)
+# ------------------------------------------------------------------------------
+config wifi-device 'radio1'
+        option type 'mac80211'
+        option path 'platform/usbhost/fd000000.usb/xhci-hcd.0.auto/usb2/2-1/2-1.2/2-1.2:1.0'
+        # Faixa de frequência: 2.4GHz
+        option band '2g'
+        # Canal 11 (Canais limpos e sem sobreposição em 2.4GHz são: 1, 6 e 11):
+        option channel '11'
+        # Modo HE20 (Wi-Fi 6 / 802.11ax em 20MHz): Maior estabilidade e compatibilidade com IoT
+        option htmode 'HE20'
+        option country 'BR'
+        option cell_density '0'
+        # Potência de transmissão: 18 dBm (~63mW)
+        option txpower '18'
+
+# ------------------------------------------------------------------------------
+# DISPOSITIVO DE RÁDIO 2: 2.4GHz Secundário / Standby (Adaptador USB)
+# ------------------------------------------------------------------------------
+config wifi-device 'radio2'
+        option type 'mac80211'
+        option path 'platform/usbhost/fd000000.usb/xhci-hcd.0.auto/usb1/1-1/1-1.2/1-1.2:1.0'
+        option band '2g'
+        # Canal 6 (não interfere com o Canal 11 do radio1):
+        option channel '6'
+        option txpower '14'
+        option country 'BR'
+        option cell_density '0'
+        # Modo HT20 (Wi-Fi 4 / 802.11n em 20MHz):
+        option htmode 'HT20'
+
+# ------------------------------------------------------------------------------
+# INTERFACE MESH 5GHz (Padrão 802.11s)
+# ------------------------------------------------------------------------------
+config wifi-iface 'mesh5g'
+        option device 'radio0'
+        option ifname 'mesh0'
+        option network 'lan'
+        # Modo Mesh (interconecta roteadores/pontos de acesso via backhaul sem fio):
+        option mode 'mesh'
+        option mesh_id 'mesh-juca'
+        # Criptografia SAE (WPA3-SAE obrigatório para mesh seguro 802.11s):
+        option encryption 'sae'
+        option key '05091960mesh'
+        # Encaminhamento de pacotes dentro da malha mesh:
+        option mesh_fwding '1'
+        option disabled '0'
+
+# ------------------------------------------------------------------------------
+# PONTO DE ACESSO (AP) 5GHz - "juca 5g"
+# ------------------------------------------------------------------------------
+config wifi-iface 'wifinet0'
+        option device 'radio0'
+        option mode 'ap'
+        option ssid 'juca 5g'
+        # Criptografia mista WPA2-PSK + WPA3-SAE (garante compatibilidade com antigos e novos):
+        option encryption 'sae-mixed'
+        option ifname 'comfast'
+        # DTIM Period 3: Intervalo de economia de energia (ótimo para bateria de smartphones):
+        option dtim_period '3'
+        option key '05091960'
+        option network 'lan'
+        option time_zone 'UTC0'
+        # --------------------------------------------------------------------------
+        # FAST ROAMING (802.11r / 802.11k / 802.11v) - Transição Rápida e Suave
+        # --------------------------------------------------------------------------
+        option ieee80211r '1'           # Ativa 802.11r (Fast BSS Transition)
+        option ft_over_ds '1'          # Transição via rede cabeada/DS (mais rápida)
+        option mobility_domain 'e1a1'  # MESMO domínio para 5G e 2G permite roaming contínuo
+        option ft_psk_generate_local '1'
+        option rrm '1'                 # 802.11k (Radio Resource Management - envia lista de vizinhos)
+        option bss_transition '1'      # 802.11v (BSS Transition Management - orienta o cliente a trocar de banda)
+        option time_advertisement '2'
+        option disabled '0'
+
+# ------------------------------------------------------------------------------
+# PONTO DE ACESSO (AP) 2.4GHz - "juca 2g"
+# ------------------------------------------------------------------------------
+config wifi-iface 'wifinet1'
+        option device 'radio1'
+        option mode 'ap'
+        option ssid 'juca 2g'
+        option encryption 'sae-mixed'
+        option ifname 'edup'
+        option dtim_period '3'
+        option key '05091960'
+        option network 'lan'
+        # --------------------------------------------------------------------------
+        # FAST ROAMING (Mesmo mobility_domain 'e1a1' do 5GHz)
+        # --------------------------------------------------------------------------
+        option ieee80211r '1'
+        option ft_over_ds '1'
+        option mobility_domain 'e1a1'
+        option ft_psk_generate_local '1'
+        option rrm '1'
+        option bss_transition '1'
+        option time_advertisement '2'
+        option time_zone 'UTC0'
+        option disabled '0'

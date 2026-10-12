@@ -1,0 +1,21 @@
+# ==============================================================================
+# OpenWRT / FriendlyWrt - Inicialização Automática de Containers LXC no Boot
+# Localização: /etc/config/lxc-auto
+# ==============================================================================
+
+# Container LXC do Unbound DNS Recursivo com Redis Cache:
+config container
+        option name 'unbound'
+        option autostart '1'
+        # Ordem de inicialização (Unbound deve iniciar ANTES do Technitium):
+        # option timeout '10'
+
+# Container LXC do Technitium DNS Primário (dns01):
+config container
+        option name 'dns01'
+        option autostart '1'
+
+# Container LXC do Technitium DNS Secundário (dns02):
+config container
+        option name 'dns02'
+        option autostart '1'
