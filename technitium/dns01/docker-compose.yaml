@@ -1,8 +1,8 @@
 services:
   technitium:
     # Imagem fixa (evita mudanças inesperadas em updates)
-    # image: technitium/dns-server:14.3.0
-    image: technitium/dns-server:15.4.0
+    # image: technitium/dns-server:15.4.0
+    image: technitium/dns-server:15.6.1
 
     # Nome do container (facilita debug/logs)
     container_name: dns01
@@ -106,6 +106,9 @@ services:
 
       # Redes permitidas a usar recursão (segurança)
       DNS_SERVER_RECURSION_NETWORK_ACL: "10.0.0.0/8,192.168.0.0/16"
+
+      # Mantém estatísticas na RAM, poupando a vida útil do cartão SD/eMMC:
+  DNS_SERVER_STATS_ENABLE_IN_MEMORY_STATS: "true"
 
       # DNS_SERVER_ENABLE_BLOCKING: "true"
       # DNS_SERVER_OPTIONAL_PROTOCOL_DNS_OVER_HTTP: "true"
