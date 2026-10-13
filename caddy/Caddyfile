@@ -42,6 +42,11 @@ jellyfin.home.lan {
     tls internal  # Emite certificado TLS local automaticamente
 }
 
+router.home.lan {
+    reverse_proxy 10.10.10.1:80
+    tls internal
+}
+
 transmission.home.lan {
     reverse_proxy 10.10.10.140:7777
     tls internal
@@ -53,12 +58,21 @@ pyload.home.lan {
 }
 
 dns01.home.lan {
-    reverse_proxy 10.10.10.25:5380
+    # Technitium escuta em HTTPS na porta 53443 com certificado autoassinado:
+    reverse_proxy https://10.10.10.25:53443 {
+        transport http {
+            tls_insecure_skip_verify
+        }
+    }
     tls internal
 }
 
 dns02.home.lan {
-    reverse_proxy 10.10.10.26:5380
+    reverse_proxy https://10.10.10.26:53443 {
+        transport http {
+            tls_insecure_skip_verify
+        }
+    }
     tls internal
 }
 
