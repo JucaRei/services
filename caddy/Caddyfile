@@ -1,0 +1,56 @@
+# ==============================================================================
+# Caddyfile - Configuração do Proxy Reverso
+# Homelab Services: Gateway / Reverse Proxy (LXC harden @ 10.10.10.27)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# CONFIGURAÇÕES GLOBAIS
+# ------------------------------------------------------------------------------
+{
+    # Descomente e informe seu e-mail para notificações do Let's Encrypt / ZeroSSL:
+    # email seu-email@exemplo.com
+
+    # Formato e nível dos logs na saída padrão do container:
+    log {
+        output stdout
+        format console
+        level INFO
+    }
+}
+
+# ------------------------------------------------------------------------------
+# 1. ACESSO LOCAL / TESTE DIRETO POR IP (Sem HTTPS)
+# Útil para testar a comunicação entre o Caddy e o Jellyfin na rede interna.
+# ------------------------------------------------------------------------------
+:80 {
+    # Encaminha as requisições HTTP para a porta do Jellyfin no host 10.10.10.2:
+    reverse_proxy 10.10.10.139:3545 {
+        # Repassa os cabeçalhos de identificação do cliente original:
+        header_up Host {upstream_hostport}
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+}
+
+# ------------------------------------------------------------------------------
+# 2. ACESSO EXTERNO SEGURO (HTTPS Automático via Let's Encrypt)
+# Para ativar o acesso público com certificado SSL automático:
+# 1. Aponte seu domínio/DDNS (ex: jellyfin.meudominio.com ou meujellyfin.duckdns.org) para o seu IP público.
+# 2. Descomente o bloco abaixo e substitua "jellyfin.meudominio.com.br" pelo seu domínio.
+# ------------------------------------------------------------------------------
+# jellyfin.meudominio.com.br {
+#     # Proxy reverso otimizado para o Jellyfin:
+#     reverse_proxy 10.10.10.2:3545 {
+#         # Suporte a WebSockets para sincronização de reprodução em tempo real:
+#         header_up Host {upstream_hostport}
+#         header_up X-Real-IP {remote_host}
+#         header_up X-Forwarded-For {remote_host}
+#         header_up X-Forwarded-Proto {scheme}
+#
+#         # Otimização de buffer de transporte para streaming de vídeo:
+#         transport http {
+#             read_buffer 8192
+#         }
+#     }
+# }

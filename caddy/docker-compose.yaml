@@ -1,0 +1,40 @@
+# ==============================================================================
+# Caddy Reverse Proxy - Docker Compose
+# Homelab Services: Gateway / Reverse Proxy (LXC harden @ 10.10.10.27)
+# ==============================================================================
+
+services:
+  caddy:
+    image: caddy:alpine
+    container_name: caddy-proxy
+    restart: unless-stopped
+
+    # Portas expostas para proxy reverso
+    ports:
+      - "80:80/tcp"        # HTTP (Redirecionamento / ACME HTTP-01)
+      - "443:443/tcp"      # HTTPS (TLS / SSL)
+      - "443:443/udp"      # HTTP/3 (QUIC) para altíssima performance em streaming
+
+    volumes:
+      # Arquivo de configuração montado em modo somente leitura (ro):
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+
+      # Armazenamento persistente de certificados TLS gerados automaticamente:
+      - ./data:/data
+
+      # Arquivos de estado e configuração interna do Caddy:
+      - ./config:/config
+
+    # Rotação de logs em JSON para não estourar o disco/eMMC:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Limites de recursos adequados para o LXC harden (128M RAM):
+    mem_limit: 64M
+    deploy:
+      resources:
+        limits:
+          memory: 64M
