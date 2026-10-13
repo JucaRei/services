@@ -18,6 +18,7 @@ Repositório de backup comentado e documentado de todas as configurações do ro
 | [**`uhttpd`**](uhttpd) | Servidor Web da interface gráfica LuCI | Portas 80/443, certificado TLS em Curva Elíptica (P-256), proteção RFC1918 |
 | [**`sqm`**](sqm) | Controle de Fila / Bufferbloat (CAKE) | Otimizado para 150M Down / 41M Up PPPoE, ping estável sob carga máxima |
 | [**`irqbalance`**](irqbalance) | Balanceamento de IRQs de hardware | Distribui eth0, eth1 e Wi-Fi USB xHCI entre os 4 núcleos do RK3568 |
+| [**`usteer`**](usteer) | Assistência a Roaming e BSS Transition | Monitora RSSI e dispara 802.11v BTM para nós Mesh e APs |
 
 ---
 
@@ -42,7 +43,7 @@ Se você reinstalar ou resetar o NanoPi R3S, basta enviar os arquivos desta past
 
 ```bash
 # Executado a partir do seu PC (na pasta services/unbound/openwrt):
-scp wireless dhcp network firewall system lxc-auto dropbear uhttpd sqm irqbalance root@10.10.10.1:/etc/config/
+scp wireless dhcp network firewall system lxc-auto dropbear uhttpd sqm irqbalance usteer root@10.10.10.1:/etc/config/
 
 # Em seguida, no terminal do OpenWrt, reinicie os serviços essenciais:
 ssh root@10.10.10.1
@@ -54,6 +55,7 @@ ssh root@10.10.10.1
 /etc/init.d/lxc-auto restart
 /etc/init.d/sqm restart
 /etc/init.d/irqbalance restart
+/etc/init.d/usteer restart
 wifi reload
 ```
 

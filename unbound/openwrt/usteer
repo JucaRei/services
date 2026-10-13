@@ -1,0 +1,65 @@
+# ==============================================================================
+# OpenWRT / FriendlyWrt - Configuração do Usteer (AP Steering & Roaming)
+# Roteador: NanoPi R3S (com adaptadores Wi-Fi USB Comfast 5G e Edup 2.4G)
+# Localização no roteador: /etc/config/usteer
+# ==============================================================================
+# O que é o Usteer:
+# É o daemon de assistência a roaming que monitora clientes Wi-Fi em tempo real
+# e envia mensagens ativas 802.11v BTM (BSS Transition Management) sugerindo
+# a troca de ponto de acesso quando o sinal enfraquece.
+#
+# Comportamento com SSIDs separados ('juca 5g' e 'juca 2g'):
+# - AP Steering (Entre nós Mesh): Funciona perfeitamente. Se houver nós secundários
+#   no Mesh, ele move o cliente no 'juca 5g' para o outro nó 'juca 5g'.
+# - Band Steering (2.4G <-> 5G): O protocolo 802.11v só permite transição entre
+#   o mesmo SSID. Para migração automática entre bandas, os SSIDs precisariam ser iguais.
+# ==============================================================================
+
+config usteer
+        # Interface de rede onde o usteer sincroniza mensagens entre nós:
+        option network 'lan'
+
+        # Lista de SSIDs que o usteer deve gerenciar:
+        # NOTA: O parâmetro oficial no usteer é 'ssid_list'
+        list ssid_list 'juca 5g'
+        list ssid_list 'juca 2g'
+
+        # Nível de log detalhado (0 = erros, 1 = informações, 2 = depuração completa):
+        option debug_level '1'
+
+        # SNR mínima (Relação Sinal/Ruído) aceitável para permitir uma nova conexão:
+        option min_connect_snr '12'
+
+        # SNR mínima geral de operação:
+        option min_snr '0'
+
+        # Tempo máximo (em ms) do processo de decisão de roaming:
+        option roam_process_timeout '5000'
+
+        # Limiar de sinal em dBm para iniciar a varredura de nós vizinhos (-70 dBm):
+        # Quando o sinal cai abaixo de -70 dBm, o roteador orienta o cliente a procurar outro nó
+        option roam_scan_snr '-70'
+
+        # Limiar de sinal em dBm para disparar o pedido 802.11v de troca (-72 dBm):
+        # O roteador sugere ativamente a migração para o melhor ponto de acesso
+        option roam_trigger_snr '-72'
+
+        # Tempo de espera (em ms) antes de forçar desconexão se o cliente ignorar o 802.11v:
+        # 10000ms = 10 segundos
+        option roam_kick_delay '10000'
+
+        # Diferença mínima de sinal (em dB) para sugerir a banda de 5GHz:
+        option band_steering_threshold '10'
+
+        # Chute baseado em sobrecarga de canal (desativado para evitar desconexões bruscas):
+        option load_kick_enabled '0'
+
+# ==============================================================================
+# Comandos úteis no OpenWrt via SSH:
+#
+# 1. Verificar logs do usteer em tempo real:
+#    logread -f -e usteer
+#
+# 2. Reiniciar o serviço após alterações:
+#    /etc/init.d/usteer restart
+# ==============================================================================
