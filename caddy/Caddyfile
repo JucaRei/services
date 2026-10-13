@@ -34,14 +34,23 @@
 }
 
 # ------------------------------------------------------------------------------
-# 2. ACESSO EXTERNO SEGURO (HTTPS Automático via Let's Encrypt)
+# 2. ACESSO LOCAL VIA NOME DNS (Technitium: jellyfin.home.lan -> 10.10.10.27)
+# Permite abrir http://jellyfin.home.lan ou https://jellyfin.home.lan na porta 80/443 padrão
+# ------------------------------------------------------------------------------
+jellyfin.home.lan {
+    reverse_proxy 10.10.10.139:3545
+    tls internal  # Emite certificado TLS local automaticamente
+}
+
+# ------------------------------------------------------------------------------
+# 3. ACESSO EXTERNO SEGURO (HTTPS Automático via Let's Encrypt / Domínio Público)
 # Para ativar o acesso público com certificado SSL automático:
 # 1. Aponte seu domínio/DDNS (ex: jellyfin.meudominio.com ou meujellyfin.duckdns.org) para o seu IP público.
 # 2. Descomente o bloco abaixo e substitua "jellyfin.meudominio.com.br" pelo seu domínio.
 # ------------------------------------------------------------------------------
 # jellyfin.meudominio.com.br {
 #     # Proxy reverso otimizado para o Jellyfin:
-#     reverse_proxy 10.10.10.2:3545 {
+#     reverse_proxy 10.10.10.139:3545 {
 #         # Suporte a WebSockets para sincronização de reprodução em tempo real:
 #         header_up Host {upstream_hostport}
 #         header_up X-Real-IP {remote_host}
