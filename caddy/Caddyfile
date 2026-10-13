@@ -42,6 +42,16 @@ jellyfin.home.lan {
     tls internal  # Emite certificado TLS local automaticamente
 }
 
+transmission.home.lan {
+    reverse_proxy 10.10.10.140:7777
+    tls internal
+}
+
+pyload.home.lan {
+    reverse_proxy 10.10.10.140:5000
+    tls internal
+}
+
 # ------------------------------------------------------------------------------
 # 3. ACESSO EXTERNO SEGURO (HTTPS Automático via Let's Encrypt / Domínio Público)
 # Para ativar o acesso público com certificado SSL automático:
