@@ -7,7 +7,7 @@ config interface 'loopback'
 config globals 'globals'
         option ula_prefix 'fd00:ab:cd::/48'
         option packet_steering '1'
-        option steering_flows '128'
+        option steering_flows '128'     # 128 fluxos: ideal para o RK3568 evitar reordenação de pacotes TCP e cache thrashing
 
 config device
         option name 'eth0'

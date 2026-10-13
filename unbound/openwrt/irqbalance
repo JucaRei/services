@@ -1,0 +1,47 @@
+# ==============================================================================
+# OpenWRT / FriendlyWrt - Configuração do Irqbalance
+# Roteador: NanoPi R3S (Processador Rockchip RK3568 Quad-Core Cortex-A55)
+# Localização no roteador: /etc/config/irqbalance
+# ==============================================================================
+# O que é o Irqbalance:
+# É um daemon que monitora dinamicamente a carga de interrupções de hardware (IRQs)
+# do sistema e as distribui de forma inteligente entre os 4 núcleos de CPU (CPU0 a CPU3).
+#
+# Por que ele é fundamental no NanoPi R3S:
+# 1. Sem o irqbalance, quase todas as interrupções de hardware caem na CPU0 por padrão,
+#    criando gargalo de latência e travamentos enquanto CPU1, CPU2 e CPU3 ficam ociosos.
+# 2. Distribuição das portas de rede:
+#    - eth0 (WAN / PPPoE): ancorado na CPU1
+#    - eth1 (LAN / br-lan): ancorado na CPU3
+# 3. Adaptadores Wi-Fi USB (Comfast 5G e Edup 2.4G):
+#    - Dispositivos Wi-Fi USB dependem do barramento xHCI (xhci-hcd) e geram milhares
+#      de interrupções contínuas de pacotes (URBs). O irqbalance garante que o tráfego
+#      USB não concorra diretamente no mesmo núcleo das placas Gigabit cabeadas.
+# ==============================================================================
+
+config irqbalance 'irqbalance'
+        # Habilita o daemon irqbalance no boot do sistema (1 = ativo, 0 = inativo):
+        option enabled '1'
+
+        # Intervalo em segundos entre as análises e rebalanceamento de carga (padrão: 10s):
+        # Um intervalo de 10s é ideal para evitar trocas excessivas de contexto (cache thrashing)
+        option interval '10'
+
+        # Argumentos adicionais opcionais passados ao binário /usr/sbin/irqbalance:
+        # -c 2 : Balanceamento no nível de núcleos/cache L2 (perfeito para o RK3568)
+        # -t 10: Intervalo de 10 segundos
+        # option extra_args '-c 2 -t 10'
+
+# ==============================================================================
+# Comandos úteis para diagnóstico no OpenWrt via SSH:
+#
+# 1. Verificar se o processo está em execução:
+#    ps | grep irqbalance
+#
+# 2. Monitorar a distribuição das interrupções entre os 4 núcleos:
+#    grep -E "eth|usb|xhci|dwc" /proc/interrupts
+#
+# 3. Iniciar e habilitar o serviço manualmente:
+#    /etc/init.d/irqbalance enable
+#    /etc/init.d/irqbalance start
+# ==============================================================================

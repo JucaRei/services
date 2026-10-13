@@ -17,8 +17,7 @@ config dnsmasq
         list server '/cache.nixos.org/8.8.8.8'
         list server '/cache.nixos.org/1.1.1.1'
         option cachesize '1000'
-        # option dnssec '0'  
-        option dnssec '1'   # Ativar DNSSEC para validação de DNS
+        option dnssec '0'               # Desativado no dnsmasq (Unbound e Technitium já validam DNSSEC)
         option ednspacket_max '1232'
 
 config dhcp 'lan'
@@ -143,6 +142,13 @@ config host
         option name 'unbound'
         list mac 'XX:XX:XX:XX:XX:XX'
         option ip '10.10.10.53'
+        option leasetime '12h'
+        list tag 'server'
+        list tag 'lxc'
+
+config host
+        option name 'harden'
+        option ip '10.10.10.27'
         option leasetime '12h'
         list tag 'server'
         list tag 'lxc'

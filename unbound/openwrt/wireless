@@ -55,6 +55,7 @@ config wifi-device 'radio2'
         option cell_density '0'
         # Modo HT20 (Wi-Fi 4 / 802.11n em 20MHz):
         option htmode 'HT20'
+        option disabled '1'             # Desativado por padrão para não sobrecarregar o barramento USB desnecessariamente
 
 # ------------------------------------------------------------------------------
 # INTERFACE MESH 5GHz (Padrão 802.11s)
@@ -97,6 +98,7 @@ config wifi-iface 'wifinet0'
         option ft_psk_generate_local '1'
         option rrm '1'                 # 802.11k (Radio Resource Management - envia lista de vizinhos)
         option bss_transition '1'      # 802.11v (BSS Transition Management - orienta o cliente a trocar de banda)
+        option disassoc_low_ack '1'    # Desconecta clientes com sinal degradado para acelerar roaming
         option time_advertisement '2'
         option disabled '0'
 
@@ -121,6 +123,7 @@ config wifi-iface 'wifinet1'
         option ft_psk_generate_local '1'
         option rrm '1'
         option bss_transition '1'
+        option disassoc_low_ack '1'
         option time_advertisement '2'
         option time_zone 'UTC0'
         option disabled '0'

@@ -8,14 +8,22 @@ config container
         option name 'unbound'
         option autostart '1'
         # Ordem de inicialização (Unbound deve iniciar ANTES do Technitium):
-        # option timeout '10'
+        option timeout '10'
 
 # Container LXC do Technitium DNS Primário (dns01):
 config container
         option name 'dns01'
         option autostart '1'
+        option timeout '5'
 
 # Container LXC do Technitium DNS Secundário (dns02):
 config container
         option name 'dns02'
         option autostart '1'
+        option timeout '5'
+
+# 4º INICIA O HARDEN / CADDY (Borda e Proxy Web)
+config container
+        option name 'harden'
+        option autostart '1'
+        option timeout '5'
