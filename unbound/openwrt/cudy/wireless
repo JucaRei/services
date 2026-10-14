@@ -1,0 +1,74 @@
+# ==============================================================================
+# OpenWRT - Configuração Wi-Fi (Cudy AP / Nó Mesh Secundário)
+# Roteador: Cudy (IP: 10.10.10.45)
+# Localização no roteador: /etc/config/wireless
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# RÁDIO 0: 2.4GHz Wi-Fi 6 (HE20) - Canal 1
+# Estratégia de Espectro: Canal 1 no Cudy vs Canal 11 no NanoPi (Zero Interferência)
+# ------------------------------------------------------------------------------
+config wifi-device 'radio0'
+        option type 'mac80211'
+        option path 'platform/soc/18000000.wifi'
+        option band '2g'
+        option channel '1'
+        option htmode 'HE20'
+        option country 'BR'
+        option cell_density '0'
+
+config wifi-iface 'default_radio0'
+        option device 'radio0'
+        option network 'lan'
+        option mode 'ap'
+        option ssid 'juca 2g'
+        option encryption 'sae-mixed'
+        option key '05091960'
+        option ieee80211r '1'
+        option ft_over_ds '1'
+        option mobility_domain 'e1a1'
+        option ft_psk_generate_local '1'
+        option rrm '1'
+        option bss_transition '1'
+        option disassoc_low_ack '1'
+        option time_advertisement '2'
+        option time_zone 'UTC0'
+
+# ------------------------------------------------------------------------------
+# RÁDIO 1: 5GHz Wi-Fi 6 (HE80) - Canal 153
+# Pareado no mesmo canal do NanoPi para fechar o Backhaul Mesh 802.11s
+# ------------------------------------------------------------------------------
+config wifi-device 'radio1'
+        option type 'mac80211'
+        option path 'platform/soc/18000000.wifi+1'
+        option band '5g'
+        option channel '153'
+        option htmode 'HE80'
+        option country 'BR'
+        option cell_density '0'
+
+config wifi-iface 'mesh5g'
+        option device 'radio1'
+        option network 'lan'
+        option mode 'mesh'
+        option mesh_id 'mesh-juca'
+        option encryption 'sae'
+        option key '05091960mesh'
+        option mesh_fwding '1'
+
+config wifi-iface 'default_radio1'
+        option device 'radio1'
+        option network 'lan'
+        option mode 'ap'
+        option ssid 'juca 5g'
+        option encryption 'sae-mixed'
+        option key '05091960'
+        option ieee80211r '1'
+        option ft_over_ds '1'
+        option mobility_domain 'e1a1'
+        option ft_psk_generate_local '1'
+        option rrm '1'
+        option bss_transition '1'
+        option disassoc_low_ack '1'
+        option time_advertisement '2'
+        option time_zone 'UTC0'

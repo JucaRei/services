@@ -1,0 +1,35 @@
+# ==============================================================================
+# OpenWRT - Configuração de Rede (Cudy Dumb AP / Nó Mesh Secundário)
+# Roteador: Cudy (IP: 10.10.10.45)
+# Localização no roteador: /etc/config/network
+# ==============================================================================
+
+config interface 'loopback'
+        option device 'lo'
+        option proto 'static'
+        list ipaddr '127.0.0.1/8'
+
+config globals 'globals'
+        option dhcp_default_duid '0004a0a1b2f6ba0341e39d7238783ef0ead0'
+        option ula_prefix 'fd2f:446:a9ae::/48'
+
+# Bridge unificada: Todas as portas LAN (lan1, lan2, lan3) e a porta WAN
+# estão unificadas em uma única bridge de switch Gigabit
+config device
+        option name 'br-lan'
+        option type 'bridge'
+        list ports 'lan1'
+        list ports 'lan2'
+        list ports 'lan3'
+        list ports 'wan'
+
+# Interface LAN estática apontando para o Gateway principal (NanoPi R3S)
+config interface 'lan'
+        option device 'br-lan'
+        option proto 'static'
+        option ipaddr '10.10.10.45'
+        option netmask '255.255.255.0'
+        option gateway '10.10.10.1'
+        list dns '10.10.10.25'
+        list dns '10.10.10.26'
+        option delegate '0'

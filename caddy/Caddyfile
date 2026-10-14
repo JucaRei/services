@@ -42,11 +42,6 @@ jellyfin.home.lan {
     tls internal  # Emite certificado TLS local automaticamente
 }
 
-router.home.lan {
-    reverse_proxy 10.10.10.1:80
-    tls internal
-}
-
 transmission.home.lan {
     reverse_proxy 10.10.10.140:7777
     tls internal
