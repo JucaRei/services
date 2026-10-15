@@ -22,15 +22,11 @@ config wifi-iface 'default_radio0'
         option network 'lan'
         option mode 'ap'
         option ssid 'juca 2g'
-        option encryption 'sae-mixed'
+        # Compatibilidade Máxima com Aparelhos Antigos e IoT (ESP8266/ESP32, lâmpadas, tomadas):
+        option encryption 'psk2'       # WPA2-PSK puro (AES/CCMP) - evita falhas de autenticação do WPA3
+        option ieee80211r '0'          # 802.11r desativado (dispositivos legados não suportam FT)
+        option ieee80211w '0'          # PMF desativado (obrigatório para conexão de aparelhos antigos)
         option key '05091960'
-        option ieee80211r '1'
-        option ft_over_ds '1'
-        option mobility_domain 'e1a1'
-        option ft_psk_generate_local '1'
-        option rrm '1'
-        option bss_transition '1'
-        option disassoc_low_ack '1'
         option time_advertisement '2'
         option time_zone 'UTC0'
 
