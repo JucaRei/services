@@ -71,6 +71,11 @@ dns02.home.lan {
     tls internal
 }
 
+sharecenter.home.lan {
+    reverse_proxy 10.10.10.10:80
+    tls internal
+}
+
 soyoz.home.lan {
     # Proxmox opera nativamente em HTTPS com certificado autoassinado:
     reverse_proxy https://10.10.10.5:8006 {
