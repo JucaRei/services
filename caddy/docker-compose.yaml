@@ -25,6 +25,9 @@ services:
       # Arquivos de estado e configuração interna do Caddy:
       - ./config:/config
 
+      # Diretório de logs de acesso consumido pelo CrowdSec:
+      - ./logs:/var/log/caddy
+
     # Rotação de logs em JSON para não estourar o disco/eMMC:
     logging:
       driver: "json-file"

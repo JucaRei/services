@@ -1,0 +1,17 @@
+# ==============================================================================
+# CrowdSec - Configuração de Aquisição de Logs (acquis.yaml)
+# ==============================================================================
+
+# 1. Logs de acesso do Caddy (Formato JSON)
+filenames:
+  - /var/log/caddy/*.log
+labels:
+  type: caddy
+
+---
+# 2. Logs de autenticação e SSH do Host (LXC harden)
+filenames:
+  - /var/log/auth.log
+  - /var/log/secure
+labels:
+  type: syslog

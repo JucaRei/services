@@ -1,0 +1,43 @@
+# ==============================================================================
+# CrowdSec Security Engine - Docker Compose
+# Homelab Services: Gateway / Security (LXC harden @ 10.10.10.27)
+# ==============================================================================
+
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    container_name: crowdsec
+    restart: unless-stopped
+    environment:
+      # Coleções oficiais para detecção de ameaças no Caddy, Linux e CVEs comuns:
+      - COLLECTIONS=crowdsecurity/caddy crowdsecurity/linux crowdsecurity/whitelist-good-actors crowdsecurity/http-cve
+      - LEVEL=INFO
+    volumes:
+      # Configurações e parsers baixados pelo CrowdSec:
+      - ./config:/etc/crowdsec
+      # Banco de dados SQLite local de decisões e reputação:
+      - ./data:/var/lib/crowdsec/data
+      # Arquivo de mapeamento de logs:
+      - ./acquis.yaml:/etc/crowdsec/acquis.yaml:ro
+      # Logs de acesso do Caddy (montados em modo somente leitura):
+      - ../caddy/logs:/var/log/caddy:ro
+      # Logs do sistema do host para monitorar ataques SSH:
+      - /var/log/auth.log:/var/log/auth.log:ro
+      - /var/log/messages:/var/log/messages:ro
+    ports:
+      # API local do CrowdSec (LAPI) - Restrita ao localhost do container:
+      - "127.0.0.1:8080:8080"
+
+    # Rotação de logs do container para não consumir disco/eMMC:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Limite de memória adequado para o NanoPi R3S:
+    mem_limit: 128M
+    deploy:
+      resources:
+        limits:
+          memory: 128M

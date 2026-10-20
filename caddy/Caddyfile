@@ -19,18 +19,26 @@
 }
 
 # ------------------------------------------------------------------------------
+# SNIPPET: LOGS DE ACESSO FORMATADOS EM JSON PARA O CROWDSEC
+# ------------------------------------------------------------------------------
+(crowdsec_log) {
+    log {
+        output file /var/log/caddy/access.log {
+            roll_size 10mb
+            roll_keep 3
+        }
+        format json
+    }
+}
+
+# ------------------------------------------------------------------------------
 # 1. ACESSO LOCAL / TESTE DIRETO POR IP (Sem HTTPS)
 # Útil para testar a comunicação entre o Caddy e o Jellyfin na rede interna.
 # ------------------------------------------------------------------------------
 :80 {
+    import crowdsec_log
     # Encaminha as requisições HTTP para a porta do Jellyfin no host 10.10.10.2:
-    reverse_proxy 10.10.10.139:3545 {
-        # Repassa os cabeçalhos de identificação do cliente original:
-        header_up Host {upstream_hostport}
-        header_up X-Real-IP {remote_host}
-        header_up X-Forwarded-For {remote_host}
-        header_up X-Forwarded-Proto {scheme}
-    }
+    reverse_proxy 10.10.10.139:3545
 }
 
 # ------------------------------------------------------------------------------
@@ -38,25 +46,30 @@
 # Permite abrir http://jellyfin.home.lan ou https://jellyfin.home.lan na porta 80/443 padrão
 # ------------------------------------------------------------------------------
 http://jellyfin.home.lan {
+    import crowdsec_log
     reverse_proxy 10.10.10.139:3545
 }
 
 https://jellyfin.home.lan {
+    import crowdsec_log
     reverse_proxy 10.10.10.139:3545
     tls internal  # Emite certificado TLS local automaticamente
 }
 
 transmission.home.lan {
+    import crowdsec_log
     reverse_proxy 10.10.10.140:7777
     tls internal
 }
 
 pyload.home.lan {
+    import crowdsec_log
     reverse_proxy 10.10.10.140:5000
     tls internal
 }
 
 dns01.home.lan {
+    import crowdsec_log
     # Technitium escuta em HTTPS na porta 53443 com certificado autoassinado:
     reverse_proxy https://10.10.10.25:53443 {
         transport http {
@@ -67,6 +80,7 @@ dns01.home.lan {
 }
 
 dns02.home.lan {
+    import crowdsec_log
     reverse_proxy https://10.10.10.26:53443 {
         transport http {
             tls_insecure_skip_verify
@@ -76,11 +90,13 @@ dns02.home.lan {
 }
 
 sharecenter.home.lan {
+    import crowdsec_log
     reverse_proxy 10.10.10.10:80
     tls internal
 }
 
 soyoz.home.lan {
+    import crowdsec_log
     # Proxmox opera nativamente em HTTPS com certificado autoassinado:
     reverse_proxy https://10.10.10.5:8006 {
         transport http {
