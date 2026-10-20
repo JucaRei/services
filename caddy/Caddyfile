@@ -7,8 +7,8 @@
 # CONFIGURAÇÕES GLOBAIS
 # ------------------------------------------------------------------------------
 {
-    # Descomente e informe seu e-mail para notificações do Let's Encrypt / ZeroSSL:
-    # email seu-email@exemplo.com
+    # Desativa o redirecionamento automático forçado de HTTP para HTTPS:
+    auto_https disable_redirects
 
     # Formato e nível dos logs na saída padrão do container:
     log {
@@ -37,7 +37,11 @@
 # 2. ACESSO LOCAL VIA NOME DNS (Technitium: jellyfin.home.lan -> 10.10.10.27)
 # Permite abrir http://jellyfin.home.lan ou https://jellyfin.home.lan na porta 80/443 padrão
 # ------------------------------------------------------------------------------
-http://jellyfin.home.lan, https://jellyfin.home.lan {
+http://jellyfin.home.lan {
+    reverse_proxy 10.10.10.139:3545
+}
+
+https://jellyfin.home.lan {
     reverse_proxy 10.10.10.139:3545
     tls internal  # Emite certificado TLS local automaticamente
 }
