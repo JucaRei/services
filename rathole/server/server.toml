@@ -3,16 +3,15 @@
 bind_addr = "0.0.0.0:2333"
 
 # Chave secreta (DEVE ser idêntica à colocada no client.toml)
-default_token = "TOKEN_SECRETO_AQUI"
+default_token = "4d6fd6c76534705780481ea75f85af29"
 
 # -------------------------------------------------------------
-# Exemplo 1: Serviço Web (nome precisa bater com o client.toml)
+# Exemplo 1: Serviço Web (Jellyfin)
 # -------------------------------------------------------------
-[server.services.meu_servico]
+[server.services.jellyfin]
 type = "tcp"
-# 0.0.0.0:8096 expõe a porta diretamente para a internet
-# (ou use 127.0.0.1:8096 se for colocar o Caddy/Nginx na frente com SSL)
-bind_addr = "0.0.0.0:8096"
+# 127.0.0.1:8096 escuta localmente para o Nginx receber via HTTPS
+bind_addr = "127.0.0.1:8096"
 
 # -------------------------------------------------------------
 # Exemplo 2: Acesso SSH (opcional)

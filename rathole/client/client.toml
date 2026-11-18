@@ -3,14 +3,14 @@
 remote_addr = "jucalab.duckdns.org:2333"
 
 # Token compartilhado entre o cliente e o servidor (para autenticação mútua)
-default_token = "TOKEN_SECRETO_AQUI"
+default_token = "4d6fd6c76534705780481ea75f85af29"
 
 # -------------------------------------------------------------
-# Exemplo 1: Serviço Web / Painel (ex: Jellyfin, Proxmox, etc.)
+# Exemplo 1: Serviço Web / Painel (Jellyfin)
 # -------------------------------------------------------------
-[client.services.meu_servico]
+[client.services.jellyfin]
 type = "tcp"
-local_addr = "10.10.10.135:8096" # IP e porta do serviço dentro da sua casa
+local_addr = "10.10.10.135:3545" # IP e porta do Jellyfin no host local
 
 # -------------------------------------------------------------
 # Exemplo 2: Acesso SSH ao seu PC (opcional)
