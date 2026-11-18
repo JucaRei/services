@@ -10,7 +10,7 @@ default_token = "4d6fd6c76534705780481ea75f85af29"
 # -------------------------------------------------------------
 [client.services.jellyfin]
 type = "tcp"
-local_addr = "10.10.10.135:3545" # IP e porta do Jellyfin no host local
+local_addr = "10.10.10.139:3545" # IP e porta do Jellyfin no host local
 
 # -------------------------------------------------------------
 # Exemplo 2: Acesso SSH ao seu PC (opcional)
