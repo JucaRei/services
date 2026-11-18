@@ -1,0 +1,15 @@
+[server]
+# Porta de controle pública onde o NanoPi conecta via túnel
+bind_addr = "0.0.0.0:2333"
+
+# Chave secreta compartilhada (idêntica ao client.toml do homelab)
+default_token = "4d6fd6c76534705780481ea75f85af29"
+
+# -------------------------------------------------------------
+# Serviço 1: Jellyfin (Proxy Reverso Nginx -> Rathole)
+# -------------------------------------------------------------
+[server.services.jellyfin]
+type = "tcp"
+# Escuta na porta 8096 da rede interna do Docker (acessível apenas pelo Nginx)
+bind_addr = "0.0.0.0:8096"
+

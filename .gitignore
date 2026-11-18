@@ -4,3 +4,7 @@ unbound/cache/redis/dump.rdb
 unbound/cache/redis/redis.pid
 unbound/data/unbound/log.d/unbound.log
 *.secret
+oracle-gateway/certbot/conf/*
+!oracle-gateway/certbot/conf/.gitkeep
+oracle-gateway/certbot/www/*
+!oracle-gateway/certbot/www/.gitkeep
