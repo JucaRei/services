@@ -1,0 +1,14 @@
+services:
+  rathole-server:
+    image: rapiz1/rathole:latest
+    container_name: rathole-server
+    restart: unless-stopped
+    command: ["--server", "/app/server.toml"]
+    volumes:
+      - ./server.toml:/app/server.toml:ro
+    # Usando host network para a VPS repassar as portas e IPs de forma nativa
+    network_mode: host
+    deploy:
+      resources:
+        limits:
+          memory: 32M
