@@ -1,0 +1,16 @@
+services:
+  rathole-client:
+    image: rapiz1/rathole:latest
+    container_name: rathole-client
+    restart: unless-stopped
+    # Roda o binário em modo cliente apontando para a config
+    command: ["--client", "/app/client.toml"]
+    volumes:
+      - ./client.toml:/app/client.toml:ro
+    # Usa a rede do container/host para alcançar os IPs 10.10.10.X facilmente
+    network_mode: host
+    # Limite leve de memória (consome menos de 10MB na prática)
+    deploy:
+      resources:
+        limits:
+          memory: 32M
