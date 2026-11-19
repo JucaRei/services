@@ -1,0 +1,14 @@
+services:
+  hawser:
+    image: ghcr.io/finsys/hawser:latest
+    container_name: hawser
+    restart: unless-stopped
+    environment:
+      - TOKEN=9hUr1BULPZRi-Gf-gGaPU601aN4ef39e7kWiVIxX-BI
+      - DOCKHAND_SERVER_URL=ws://10.10.10.135:7272/api/hawser/connect # Altere para o IP e porta do Dockhand (ou wss:// se tiver domínio/SSL)
+      - AGENT_NAME=jellyfin
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - hawser-data:/opt/stacks
+volumes:
+  hawser-data:
