@@ -57,7 +57,8 @@ services:
       - caddy-logs:/var/log/caddy:ro
       - /var/log/messages:/var/log/messages:ro
     ports:
-      - "127.0.0.1:8080:8080"
+      # API do CrowdSec (LAPI) exposta na LAN para o OpenWrt Firewall Bouncer:
+      - "8080:8080"
     logging:
       driver: "json-file"
       options:

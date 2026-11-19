@@ -1,0 +1,56 @@
+# ==============================================================================
+# Monitoramento e Auditoria de Rede: Beszel Hub + WatchYourLAN
+# Homelab Services: LXC monitor @ 10.10.10.28 (NanoPi R3S)
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # Beszel Hub: Dashboard de Métricas do Homelab (PocketBase SQLite)
+  # ----------------------------------------------------------------------------
+  beszel:
+    image: henrygd/beszel:latest
+    container_name: beszel-hub
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./data/beszel:/beszel_data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "3m"
+        max-file: "2"
+    mem_limit: 64M
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+
+  # ----------------------------------------------------------------------------
+  # WatchYourLAN: Scanner ARP de Dispositivos Conectados na LAN (10.10.10.0/24)
+  # ----------------------------------------------------------------------------
+  watchyourlan:
+    image: aceberg/watchyourlan:latest
+    container_name: watchyourlan
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      - IFACES=eth0
+      - TZ=America/Sao_Paulo
+      - TIMEOUT=120
+      - GUIIP=10.10.10.28
+      - GUIPORT=8840
+      - SHOUTRRR_URL="" # Opcional: Telegram/Discord webhook
+    volumes:
+      - ./data/watchyourlan:/data/WatchYourLAN
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "3m"
+        max-file: "2"
+    mem_limit: 48M
+    deploy:
+      resources:
+        limits:
+          memory: 48M
+
