@@ -59,6 +59,7 @@ services:
     ports:
       # API do CrowdSec (LAPI) exposta na LAN para o OpenWrt Firewall Bouncer:
       - "8080:8080"
+      - "514:514/udp"      # Syslog UDP do OpenWrt (Dropbear SSH, LuCI, Firewall)
     logging:
       driver: "json-file"
       options:

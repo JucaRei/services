@@ -24,19 +24,19 @@ graph LR
 ```text
 caddy/
 ├── Dockerfile              # Build do Caddy com o plugin caddy-crowdsec-bouncer
-├── docker-compose.yaml     # Orquestração do Caddy + CrowdSec (com tmpfs logs)
+├── docker-compose.yaml     # Orquestração do Caddy + CrowdSec (LAPI :8080 + Syslog UDP :514)
 ├── .env                    # Chave de API de comunicação interna (CROWDSEC_API_KEY)
 ├── Caddyfile               # Configuração do proxy e diretivas do bouncer
-├── acquis.yaml             # Mapeamento de logs para o CrowdSec
+├── acquis.yaml             # Mapeamento de logs para o CrowdSec (Caddy, host e Syslog OpenWrt)
 ├── data/                   # Certificados SSL / TLS do Caddy
 ├── config/                 # Estado interno do Caddy
 └── crowdsec/
-    ├── config/             # Parsers e cenários baixados pelo CrowdSec
+    ├── config/             # Parsers e cenários baixados pelo CrowdSec (inclui dropbear-logs)
     └── data/               # Banco SQLite com reputação e decisões
 ```
 
 > [!TIP]
-> **Proteção do eMMC (NanoPi R3S):** Os logs de acesso do Caddy são gerados dentro de um volume `tmpfs` (RAM Disk) de 16 MB. Isso significa **zero gravações na memória flash eMMC** e **zero risco de lotar o disco `/opt`**, aumentando a vida útil do hardware e a performance da análise em tempo real pelo CrowdSec.
+> **Proteção do eMMC (NanoPi R3S):** Os logs de acesso do Caddy são gerados dentro de um volume `tmpfs` (RAM Disk) de 16 MB. Além disso, o CrowdSec recebe os logs do OpenWrt via **Syslog UDP (:514)** diretamente em memória RAM. Isso significa **zero gravações na memória flash eMMC**, máxima performance e monitoramento unificado do gateway e do roteador.
 
 ---
 

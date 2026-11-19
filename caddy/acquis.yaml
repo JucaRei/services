@@ -15,3 +15,13 @@ filenames:
 labels:
   type: syslog
 
+---
+# 3. Receptor Syslog UDP do OpenWrt (Host NanoPi R3S @ 10.10.10.1)
+# Recebe logs do Dropbear (SSH), LuCI e Firewall em tempo real via RAM
+source: syslog
+listen_addr: 0.0.0.0
+listen_port: 514
+labels:
+  type: syslog
+
+
