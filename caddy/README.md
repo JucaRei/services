@@ -105,3 +105,12 @@ Deverá exibir `crowdsec: successfully connected to LAPI`.
   ```bash
   docker compose exec crowdsec cscli metrics
   ```
+
+* **Liberar espaço em disco após o build (Limpeza de Cache do BuildKit):**
+  ```bash
+  # Remove o cache de compilação do Go e imagens intermediárias (~800MB a 1.2GB liberados):
+  docker builder prune -a -f
+  docker image prune -f
+  docker rmi caddy:builder-alpine 2>/dev/null || true
+  docker system df
+  ```
