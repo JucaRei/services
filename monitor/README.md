@@ -52,6 +52,13 @@ O Beszel funciona com a arquitetura **Hub + Agent**. O Hub apenas centraliza os 
 * **Port:** `45876`
 * *Métricas coletadas:* CPU, RAM e status dos containers Docker individuais (`beszel-hub`, `watchyourlan`, `beszel-agent`).
 
+### Sistema 3: Cudy (Roteador / AP Wi-Fi Mesh @ OpenWrt)
+* **Name:** `Cudy`
+* **Host / IP:** `10.10.10.45`
+* **Port:** `45876`
+* *Métricas coletadas:* Temperatura do SoC MediaTek Filogic e dos rádios Wi-Fi (MT7915 2.4G/5G), tráfego das interfaces Mesh/AP (`phy1-mesh0`, `phy1-ap0`), CPU dual-core e RAM (240MB).
+* *Otimização de Flash:* O executável do agente roda 100% em RAM (`/tmp/beszel-agent`) sem ocupar os 3.4 MB da partição `/overlay` da flash ROM. A inicialização é gerenciada pelo `/etc/init.d/beszel-agent` via procd.
+
 Após salvar, clique no **ícone de cubo** (Systems) no topo para ver os gráficos ao vivo!
 
 ---
