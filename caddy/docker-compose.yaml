@@ -1,5 +1,5 @@
 # ==============================================================================
-# Gateway Reverso + WAF: Caddy + CrowdSec
+# Gateway Reverso + WAF: Caddy + CrowdSec (Otimizado para NanoPi R3S / eMMC)
 # Homelab Services: LXC harden @ 10.10.10.27
 # ==============================================================================
 
@@ -21,19 +21,16 @@ services:
     environment:
       - CROWDSEC_API_KEY=${CROWDSEC_API_KEY}
     volumes:
-      # Arquivo de configuração em modo leitura:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      # Armazenamento de certificados TLS:
       - ./data:/data
-      # Arquivos de estado e configuração interna do Caddy:
       - ./config:/config
-      # Diretório de logs de acesso consumido pelo CrowdSec:
-      - ./logs:/var/log/caddy
+      # Logs em RAM (tmpfs) para preservar vida útil do eMMC e não ocupar disco:
+      - caddy-logs:/var/log/caddy
     logging:
       driver: "json-file"
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: "3m"
+        max-file: "2"
     mem_limit: 128M
     deploy:
       resources:
@@ -50,30 +47,35 @@ services:
     container_name: crowdsec
     restart: unless-stopped
     environment:
-      # Coleções oficiais para Caddy, Linux e proteção HTTP:
       - COLLECTIONS=crowdsecurity/caddy crowdsecurity/linux crowdsecurity/whitelist-good-actors crowdsecurity/http-cve
       - LEVEL=INFO
     volumes:
-      # Configurações baixadas e parsers do CrowdSec:
       - ./crowdsec/config:/etc/crowdsec
-      # Banco de dados SQLite local de decisões e reputação:
       - ./crowdsec/data:/var/lib/crowdsec/data
-      # Arquivo de mapeamento de aquisição de logs:
       - ./acquis.yaml:/etc/crowdsec/acquis.yaml:ro
-      # Logs do Caddy (somente leitura):
-      - ./logs:/var/log/caddy:ro
-      # Logs do sistema do host (Alpine / LXC harden):
+      # Lê os logs direto da RAM (tmpfs) com latência zero:
+      - caddy-logs:/var/log/caddy:ro
       - /var/log/messages:/var/log/messages:ro
     ports:
-      # API local do CrowdSec (LAPI) restrita ao localhost do host:
       - "127.0.0.1:8080:8080"
     logging:
       driver: "json-file"
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: "3m"
+        max-file: "2"
     mem_limit: 128M
     deploy:
       resources:
         limits:
           memory: 128M
+
+# ------------------------------------------------------------------------------
+# VOLUMES: Logs montados estritamente em RAM (tmpfs) - Zero desgaste no eMMC
+# ------------------------------------------------------------------------------
+volumes:
+  caddy-logs:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: "size=16m,mode=1777"

@@ -24,17 +24,19 @@ graph LR
 ```text
 caddy/
 ├── Dockerfile              # Build do Caddy com o plugin caddy-crowdsec-bouncer
-├── docker-compose.yaml     # Orquestração do Caddy + CrowdSec
+├── docker-compose.yaml     # Orquestração do Caddy + CrowdSec (com tmpfs logs)
 ├── .env                    # Chave de API de comunicação interna (CROWDSEC_API_KEY)
 ├── Caddyfile               # Configuração do proxy e diretivas do bouncer
 ├── acquis.yaml             # Mapeamento de logs para o CrowdSec
-├── logs/                   # Logs de acesso JSON (compartilhado)
 ├── data/                   # Certificados SSL / TLS do Caddy
 ├── config/                 # Estado interno do Caddy
 └── crowdsec/
     ├── config/             # Parsers e cenários baixados pelo CrowdSec
     └── data/               # Banco SQLite com reputação e decisões
 ```
+
+> [!TIP]
+> **Proteção do eMMC (NanoPi R3S):** Os logs de acesso do Caddy são gerados dentro de um volume `tmpfs` (RAM Disk) de 16 MB. Isso significa **zero gravações na memória flash eMMC** e **zero risco de lotar o disco `/opt`**, aumentando a vida útil do hardware e a performance da análise em tempo real pelo CrowdSec.
 
 ---
 
