@@ -22,12 +22,37 @@ graph TD
 
 ```text
 monitor/
-├── docker-compose.yaml     # Orquestração do Beszel Hub + WatchYourLAN
+├── docker-compose.yaml     # Orquestração do Beszel Hub + Beszel Agent + WatchYourLAN
 ├── README.md               # Documentação e instruções de operação
 └── data/
-    ├── beszel/             # Banco de dados PocketBase SQLite (métricas)
+    ├── beszel/             # Banco de dados PocketBase SQLite (métricas e chaves SSH)
     └── watchyourlan/       # Histórico de dispositivos descobertos
 ```
+
+---
+
+## 🖥️ Como Adicionar os Sistemas no Beszel Hub
+
+O Beszel funciona com a arquitetura **Hub + Agent**. O Hub apenas centraliza os dados; cada máquina ou container roda um **Agent** ultraleve (~8MB RAM):
+
+1. Acesse `https://beszel.home.lan` no navegador.
+2. No canto superior direito, clique em **`+ Add System`**.
+3. Cadastre os sistemas desejados:
+
+### Sistema 1: NanoPi R3S (Host / Hardware Real)
+* **Name:** `NanoPi R3S`
+* **Host / IP:** `10.10.10.1`
+* **Port:** `45876`
+* *Métricas coletadas:* Temperatura real do SoC Rockchip RK3568, uso dos 4 núcleos da CPU, uso total da RAM (2GB), tráfego real da WAN (`pppoe-wan`) e Wi-Fi/LAN, espaço da eMMC.
+* *Serviço nativo:* `/etc/init.d/beszel-agent` (OpenWrt procd em RAM `/var/lib`, sem escrita na eMMC).
+
+### Sistema 2: LXC Monitor (Containers Docker)
+* **Name:** `LXC Monitor`
+* **Host / IP:** `10.10.10.28`
+* **Port:** `45876`
+* *Métricas coletadas:* CPU, RAM e status dos containers Docker individuais (`beszel-hub`, `watchyourlan`, `beszel-agent`).
+
+Após salvar, clique no **ícone de cubo** (Systems) no topo para ver os gráficos ao vivo!
 
 ---
 

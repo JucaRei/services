@@ -54,3 +54,27 @@ services:
         limits:
           memory: 48M
 
+  # ----------------------------------------------------------------------------
+  # Beszel Agent: Coletor de Métricas do LXC monitor
+  # ----------------------------------------------------------------------------
+  beszel-agent:
+    image: henrygd/beszel-agent:latest
+    container_name: beszel-agent
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      - PORT=45876
+      - KEY=ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII1B58FTzpO6UeWw/9DIzTnkTM2z9PtnZl5VGhseGVC0
+      - DOCKER=false
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "3m"
+        max-file: "2"
+    mem_limit: 32M
+    deploy:
+      resources:
+        limits:
+          memory: 32M
+
+
