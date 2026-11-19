@@ -9,9 +9,9 @@ labels:
   type: caddy
 
 ---
-# 2. Logs de autenticação e SSH do Host (LXC harden)
+# 2. Logs do Sistema e SSH do Host (LXC harden - Alpine Linux)
 filenames:
-  - /var/log/auth.log
-  - /var/log/secure
+  - /var/log/messages
 labels:
   type: syslog
+
