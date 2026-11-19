@@ -71,6 +71,34 @@ services:
         limits:
           memory: 128M
 
+  # ----------------------------------------------------------------------------
+  # CrowdSec Web UI: Dashboard visual em tempo real (Alertas, Decisões, Métricas)
+  # ----------------------------------------------------------------------------
+  crowdsec-ui:
+    image: ghcr.io/theduffman85/crowdsec-web-ui:latest
+    container_name: crowdsec-ui
+    restart: unless-stopped
+    environment:
+      - CONFIG_INSTANCE_LAPI_URL=http://crowdsec:8080
+      - CONFIG_INSTANCE_LAPI_AUTH_USERNAME=crowdsec-ui
+      - CONFIG_INSTANCE_LAPI_AUTH_PASSWORD=${CROWDSEC_UI_PASSWORD}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./crowdsec/ui-data:/app/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "3m"
+        max-file: "2"
+    mem_limit: 128M
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    depends_on:
+      - crowdsec
+
 # ------------------------------------------------------------------------------
 # VOLUMES: Logs montados estritamente em RAM (tmpfs) - Zero desgaste no eMMC
 # ------------------------------------------------------------------------------

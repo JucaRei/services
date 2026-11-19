@@ -124,6 +124,12 @@ wyl.home.lan, watchyourlan.home.lan {
     tls internal
 }
 
+crowdsec.home.lan {
+    import crowdsec_protect
+    reverse_proxy crowdsec-ui:3000
+    tls internal
+}
+
 # ------------------------------------------------------------------------------
 # 3. ACESSO EXTERNO SEGURO (HTTPS Automático via Let's Encrypt / Domínio Público)
 # ------------------------------------------------------------------------------

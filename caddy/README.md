@@ -24,15 +24,16 @@ graph LR
 ```text
 caddy/
 ├── Dockerfile              # Build do Caddy com o plugin caddy-crowdsec-bouncer
-├── docker-compose.yaml     # Orquestração do Caddy + CrowdSec (LAPI :8080 + Syslog UDP :514)
-├── .env                    # Chave de API de comunicação interna (CROWDSEC_API_KEY)
-├── Caddyfile               # Configuração do proxy e diretivas do bouncer
+├── docker-compose.yaml     # Orquestração Caddy + CrowdSec + Web UI
+├── .env                    # Chaves de API (CROWDSEC_API_KEY, CROWDSEC_UI_PASSWORD)
+├── Caddyfile               # Configuração do proxy e rotas (inclui crowdsec.home.lan)
 ├── acquis.yaml             # Mapeamento de logs para o CrowdSec (Caddy, host e Syslog OpenWrt)
 ├── data/                   # Certificados SSL / TLS do Caddy
 ├── config/                 # Estado interno do Caddy
 └── crowdsec/
     ├── config/             # Parsers e cenários baixados pelo CrowdSec (inclui dropbear-logs)
-    └── data/               # Banco SQLite com reputação e decisões
+    ├── data/               # Banco SQLite com reputação e decisões
+    └── ui-data/            # Dados e configurações persistentes do CrowdSec Web UI
 ```
 
 > [!TIP]
@@ -105,6 +106,11 @@ Deverá exibir `crowdsec: successfully connected to LAPI`.
   ```bash
   docker compose exec crowdsec cscli metrics
   ```
+
+* **Dashboard Web Visual (CrowdSec Web UI):**
+  - **URL Local HTTPS:** `https://crowdsec.home.lan`
+  - **URL Direta:** `http://10.10.10.27:3000`
+  - Permite visualizar em tempo real a tabela de decisões (IPs banidos), histórico de alertas, parsers ativos e gerenciar bloqueios diretamente pela interface visual.
 
 * **Liberar espaço em disco após o build (Limpeza de Cache do BuildKit):**
   ```bash
