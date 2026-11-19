@@ -7,6 +7,9 @@
 # CONFIGURAÇÕES GLOBAIS
 # ------------------------------------------------------------------------------
 {
+    # Ordem do middleware no pipeline HTTP: executa o CrowdSec antes dos proxies
+    order crowdsec first
+
     # Desativa o redirecionamento automático forçado de HTTP para HTTPS:
     auto_https disable_redirects
 
