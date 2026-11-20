@@ -33,6 +33,28 @@
 # ------------------------------------------------------------------------------
 (crowdsec_protect) {
     crowdsec
+
+    # Cabeçalhos HTTP de Segurança (WAF Hardening)
+    header {
+        # Oculta a assinatura "Server: Caddy" para evitar reconhecimento de tecnologia
+        -Server
+
+        # Proteção contra MIME-type sniffing
+        X-Content-Type-Options "nosniff"
+
+        # Proteção contra Clickjacking (apenas a própria origem pode usar iframes)
+        X-Frame-Options "SAMEORIGIN"
+
+        # Impede vazamento de caminhos e parâmetros internos para sites externos
+        Referrer-Policy "strict-origin-when-cross-origin"
+
+        # Restringe APIs invasivas do navegador em todos os serviços do homelab
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+
+        # Força o navegador a utilizar sempre HTTPS seguro
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    }
+
     log {
         output file /var/log/caddy/access.log {
             roll_size 3mb
