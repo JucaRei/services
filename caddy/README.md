@@ -107,6 +107,12 @@ Deverá exibir `crowdsec: successfully connected to LAPI`.
   docker compose exec crowdsec cscli metrics
   ```
 
+* **Verificar Cabeçalhos de Segurança (WAF Hardening):**
+  ```bash
+  curl -k -I https://crowdsec.home.lan
+  # Retorna HSTS, X-Frame-Options (SAMEORIGIN), X-Content-Type-Options (nosniff) e oculta 'Server: Caddy'
+  ```
+
 * **Dashboard Web Visual (CrowdSec Web UI):**
   - **URL Local HTTPS:** `https://crowdsec.home.lan`
   - **URL Direta:** `http://10.10.10.27:3000`
