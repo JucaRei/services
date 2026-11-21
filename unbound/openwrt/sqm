@@ -8,30 +8,28 @@ config queue 'wan'
         # Habilita o gerenciamento inteligente de filas:
         option enabled '1'
 
-        # Interface física/lógica do PPPoE:
+        # Interface lógica do PPPoE:
         option interface 'pppoe-wan'
 
         # Velocidade de Download configurada em kbps:
-        # 150 Mbps contratados -> ~93% = 140000 kbps (140 Mbps)
-        # O CAKE precisa dessa margem para manter o ping baixo durante downloads pesados
-        option download '140000'
+        option download '150000'
 
         # Velocidade de Upload configurada em kbps:
-        # 41 Mbps contratados -> ~92% = 38000 kbps (38 Mbps)
-        # Evita que uploads (vídeos, backups, torrents) saturem a latência da casa
-        option upload '38000'
+        option upload '41000'
 
-        # Algoritmo de gerenciamento de fila: CAKE (o melhor e mais moderno do Linux)
+        # Algoritmo de gerenciamento de fila: CAKE (Piece of Cake)
         option qdisc 'cake'
-
-        # Script de regras recomendado:
         option script 'piece_of_cake.qos'
 
-        # Camada de enlace (Ethernet sobre Fibra/FTTH):
+        # Camada de enlace (Ethernet sobre FTTH):
         option linklayer 'ethernet'
 
-        # Compensação de Overhead para encapsulamento PPPoE (44 bytes padrão):
+        # Compensação de Overhead para encapsulamento PPPoE:
         option overhead '44'
+
+        # Otimizações de Qdisc Ingress/Egress (NAT + Filtragem de ACKs TCP redundantes):
+        option iqdisc_opts 'nat'
+        option eqdisc_opts 'nat ack-filter'
 
         # Desativa logs excessivos no sistema:
         option verbosity '0'
