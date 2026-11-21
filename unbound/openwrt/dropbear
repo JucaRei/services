@@ -11,15 +11,15 @@ config dropbear 'main'
         option Port '22'
 
         # Permite autenticação por senha para usuários normais
-        option PasswordAuth 'on'
+        option PasswordAuth 'off'
 
         # Permite login do usuário root com senha
         # RECOMENDAÇÃO DE SEGURANÇA: Após configurar chave pública SSH (~/.ssh/authorized_keys),
         # você pode alterar esta opção para 'off' para impedir ataques de força bruta.
-        option RootPasswordAuth 'on'
+        option RootPasswordAuth 'off'
 
-        # Permite login apenas por interfaces específicas (descomente para restringir à LAN):
-        # option Interface 'lan'
+        # Permite login apenas por interfaces específicas (restringe à LAN):
+        option Interface 'lan'
 
         # Arquivo de banner exibido antes do login (opcional):
         # option BannerFile '/etc/banner'

@@ -12,6 +12,7 @@ config globals 'globals'
 config device
         option name 'eth0'
         option macaddr 'XXS:XX:XX:XX:XX:XX'
+        option mtu '1508'               # Suporte a Baby Jumbo Frames (RFC 4638) para WAN PPPoE
 
 config interface 'wan'
         option device 'eth0'

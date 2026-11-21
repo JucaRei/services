@@ -13,8 +13,8 @@ config uhttpd 'main'
         list listen_https '[::]:443'
 
         # Redirecionamento automático de HTTP para HTTPS (0 = desativado, 1 = ativado):
-        # Mude para '1' se preferir forçar conexão segura HTTPS na interface LuCI
-        option redirect_https '0'
+        # Força conexão segura HTTPS na interface LuCI
+        option redirect_https '1'
 
         # Diretório raiz dos arquivos web:
         option home '/www'

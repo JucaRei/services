@@ -98,7 +98,7 @@ config wifi-iface 'wifinet0'
         option ft_psk_generate_local '1'
         option rrm '1'                 # 802.11k (Radio Resource Management - envia lista de vizinhos)
         option bss_transition '1'      # 802.11v (BSS Transition Management - orienta o cliente a trocar de banda)
-        option disassoc_low_ack '1'    # Desconecta clientes com sinal degradado para acelerar roaming
+        option disassoc_low_ack '0'    # Desativado: permite ao usteerd fazer transição suave sem desconexões abruptas
         option time_advertisement '2'
         option disabled '0'
 

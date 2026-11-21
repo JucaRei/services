@@ -9,6 +9,9 @@ config dnsmasq
         option expandhosts '1'
         option authoritative '1'
         option noresolv '1'
+        option localservice '1'         # Aceita consultas apenas das sub-redes locais conectadas
+        list notinterface 'wan'         # Não escuta na interface de internet pública WAN
+        list notinterface 'wan6'        # Não escuta na interface de internet pública WAN6
         option strict_order '1'         # Consulta servidores na ordem estrita (primário antes do secundário)
         list server '10.10.10.25'
         list server '10.10.10.26'
