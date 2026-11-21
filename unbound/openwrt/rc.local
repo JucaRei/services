@@ -1,0 +1,62 @@
+# Put your custom commands here that should be executed once
+# the system init finished. By default this file does nothing.
+
+# ==============================================================================
+# 1. Afinidade Estática de Interrupções de Hardware (SMP IRQ Affinity) & RPS
+# ==============================================================================
+# CPU0: Sistema Operacional, Daemons, User-Space e Containers LXC
+# CPU1: eth0 (WAN PPPoE) Hard IRQ + SoftIRQ (RPS)
+# CPU2: eth1 (LAN Gigabit) Hard IRQ
+# CPU3: xHCI (Adaptadores Wi-Fi USB Comfast 5G e Edup 2.4G)
+
+# eth0 (WAN PPPoE) -> CPU1 (máscara 2)
+for irq in $(grep eth0 /proc/interrupts | awk -F: "{print \$1}" | tr -d " "); do
+    echo 2 > /proc/irq/$irq/smp_affinity 2>/dev/null
+done
+
+# eth1 (LAN Gigabit) -> CPU2 (máscara 4)
+for irq in $(grep eth1 /proc/interrupts | awk -F: "{print \$1}" | tr -d " "); do
+    echo 4 > /proc/irq/$irq/smp_affinity 2>/dev/null
+done
+
+# xHCI USB (Wi-Fi 5G/2.4G) -> CPU3 (máscara 8)
+for irq in $(grep xhci /proc/interrupts | awk -F: "{print \$1}" | tr -d " "); do
+    echo 8 > /proc/irq/$irq/smp_affinity 2>/dev/null
+done
+
+# Alinhar SoftIRQ (RPS) da eth0 na CPU1
+echo 2 > /sys/class/net/eth0/queues/rx-0/rps_cpus 2>/dev/null
+
+# ==============================================================================
+# 2. USB Power Management (Desativar Autosuspend para Adaptadores Wi-Fi USB)
+# ==============================================================================
+echo -1 > /sys/module/usbcore/parameters/autosuspend
+for dev in /sys/bus/usb/devices/*/power/control; do echo "on" > "$dev"; done
+
+# ==============================================================================
+# 3. Montagens de Rede com Verificação de Conectividade (NFS e CIFS)
+# ==============================================================================
+# Aguardar rede interna / NAS 10.10.10.10 responder (máx 30s)
+for i in $(seq 1 30); do
+    ping -c 1 -W 1 10.10.10.10 >/dev/null 2>&1 && break
+    sleep 1
+done
+
+if ping -c 1 -W 1 10.10.10.10 >/dev/null 2>&1; then
+    mountpoint -q /opt/mounts/share1 || mount -t nfs -o nolock,rw,nfsvers=3,nosuid,noexec,bg,soft,retry=5 10.10.10.10:/mnt/HD/HD_a2/Transmission/Volume_2 /opt/mounts/share1
+    mountpoint -q /opt/mounts/share2 || mount -t nfs -o nolock,rw,nfsvers=3,nosuid,noexec,bg,soft,retry=5 10.10.10.10:/mnt/HD/HD_b2 /opt/mounts/share2
+fi
+
+# Aguardar NAS 10.10.10.140 responder (máx 15s)
+for i in $(seq 1 15); do
+    ping -c 1 -W 1 10.10.10.140 >/dev/null 2>&1 && break
+    sleep 1
+done
+
+if ping -c 1 -W 1 10.10.10.140 >/dev/null 2>&1; then
+    mountpoint -q /opt/mounts/orico || mount.cifs -o guest,rw,uid=100000,gid=100000,file_mode=0777,dir_mode=0777,vers=3.0,nofail //10.10.10.140/orico /opt/mounts/orico
+    mountpoint -q /opt/mounts/hd500 || mount.cifs -o guest,rw,uid=100000,gid=100000,file_mode=0777,dir_mode=0777,vers=3.0,nofail //10.10.10.140/500GB /opt/mounts/hd500
+    mountpoint -q /opt/mounts/hd700 || mount.cifs -o guest,rw,uid=100000,gid=100000,file_mode=0777,dir_mode=0777,vers=3.0,nofail //10.10.10.140/700gb /opt/mounts/hd700
+fi
+
+exit 0
