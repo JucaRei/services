@@ -27,6 +27,9 @@ done
 # Alinhar SoftIRQ (RPS) da eth0 na CPU1
 echo 2 > /sys/class/net/eth0/queues/rx-0/rps_cpus 2>/dev/null
 
+# Maximizar anel de buffers de recepção e transmissão da WAN eth0 (1024 descritores):
+ethtool -G eth0 rx 1024 tx 1024 2>/dev/null
+
 # ==============================================================================
 # 2. USB Power Management (Desativar Autosuspend para Adaptadores Wi-Fi USB)
 # ==============================================================================
