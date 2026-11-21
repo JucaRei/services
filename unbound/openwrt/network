@@ -22,7 +22,7 @@ config interface 'wan'
         option ipv6 'auto'
 
 config interface 'wan6'
-        option device 'eth0'
+        option device '@wan'
         option proto 'dhcpv6'
 
 config device

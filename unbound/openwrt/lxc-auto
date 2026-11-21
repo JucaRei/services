@@ -3,27 +3,44 @@
 # Localização: /etc/config/lxc-auto
 # ==============================================================================
 
-# Container LXC do Unbound DNS Recursivo com Redis Cache:
+# 1º INICIA O UNBOUND (DNS Recursivo com Redis Cache):
 config container
-        option name 'unbound'
-        option autostart '1'
-        # Ordem de inicialização (Unbound deve iniciar ANTES do Technitium):
-        option timeout '10'
+	option name 'unbound'
+	option autostart '1'
+	option timeout '10'
 
-# Container LXC do Technitium DNS Primário (dns01):
+# 2º INICIA O TECHNITIUM PRIMÁRIO (dns01):
 config container
-        option name 'dns01'
-        option autostart '1'
-        option timeout '5'
+	option name 'dns01'
+	option autostart '1'
+	option timeout '5'
 
-# Container LXC do Technitium DNS Secundário (dns02):
+# 3º INICIA O TECHNITIUM SECUNDÁRIO (dns02):
 config container
-        option name 'dns02'
-        option autostart '1'
-        option timeout '5'
+	option name 'dns02'
+	option autostart '1'
+	option timeout '5'
 
-# 4º INICIA O HARDEN / CADDY (Borda e Proxy Web)
+# 4º INICIA O HARDEN / CADDY (Borda, Syslog, CrowdSec e Proxy Web):
 config container
-        option name 'harden'
-        option autostart '1'
-        option timeout '5'
+	option name 'harden'
+	option autostart '1'
+	option timeout '5'
+
+# 5º INICIA O MONITOR (Uptime Kuma, Beszel Hub):
+config container
+	option name 'monitor'
+	option autostart '1'
+	option timeout '5'
+
+# 6º INICIA O HELPER (Serviços auxiliares):
+config container
+	option name 'helper'
+	option autostart '1'
+	option timeout '5'
+
+# 7º INICIA O RDESK (RustDesk Server / Remote Desktop):
+config container
+	option name 'rdesk'
+	option autostart '1'
+	option timeout '5'
