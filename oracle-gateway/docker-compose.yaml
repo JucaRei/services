@@ -6,7 +6,10 @@
 services:
   # Servidor de Túnel Reverso (Rathole)
   rathole-server:
-    image: rapiz1/rathole:latest
+    image: localhost/rathole:local
+    build:
+      context: .
+      dockerfile: Containerfile.rathole
     container_name: rathole-server
     restart: unless-stopped
     command: ["--server", "/app/server.toml"]
