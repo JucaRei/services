@@ -1,35 +1,38 @@
-# Oracle Cloud Gateway (Nginx + Certbot + Rathole Server)
+# Oracle Cloud Gateway (Podman Rootless + Nginx + Certbot + Rathole Server + CrowdSec)
 
-Stack padronizada em Docker Compose para atuar como gateway de entrada público para o homelab através de uma VPS **Oracle Cloud Infrastructure (OCI) Always Free**.
+Stack padronizada para execução via **Podman Rootless** na VPS **Oracle Cloud Infrastructure (OCI) Always Free** (ARM64 `aarch64`), atuando como gateway de borda seguro para o homelab.
 
 ---
 
 ## 1. Visão Geral da Arquitetura
 
-```
+```text
 [ Usuário na Internet ]
-         │ (HTTPS / Porta 443)
+         │ (HTTPS / Porta 443 e HTTP / Porta 80)
          ▼
-[ VPS Oracle Cloud ]
-   ├── Nginx (nginx-proxy)
-   │     └── Terminação SSL puro (Certbot / Let's Encrypt)
-   │     └── Proxy reverso para http://rathole-server:8096 (rede interna docker)
+[ VPS Oracle Cloud - 155.181.176.184 ]
+   ├── Host Kernel (Nativo)
+   │     └── WireGuard (wg-quick@wg0) -> VPN ponto-a-ponto para nós internos / Gluetun
    │
-   └── Rathole Server (rathole-server)
-         └── Escuta pública na porta TCP 2333 (túnel seguro com o homelab)
-         │
-         │ (Túnel L4 encriptado sobre TCP 2333)
-         ▼
-[ Homelab (NanoPi R3S / Dockhand no helper 10.10.10.135) ]
+   └── Podman 5.7.0 Rootless (Backend 'pasta' - Preserva IP Real)
+         ├── CrowdSec IPS -> Análise e bloqueio em tempo real
+         ├── Nginx (nginx-proxy) -> Terminação SSL (Let's Encrypt) e Proxy Reverso
+         ├── Certbot -> Emissão e renovação automática ACME HTTP-01
+         └── Rathole Server -> Escuta pública na porta TCP 2333 (Túnel seguro com Noise)
+                   │
+                   │ (Túnel L4 encriptado sobre TCP 2333 - Protocolo Noise)
+                   ▼
+[ Homelab (Soyoz Proxmox 10.10.10.5 / 10.10.10.139) ]
    └── Rathole Client (rathole-client)
          └── Entrega a conexão localmente para o Jellyfin (10.10.10.139:3545)
 ```
 
 ### Principais Vantagens:
 * **Zero portas abertas no seu provedor de internet residencial (bypassa CGNAT)**.
-* **Segurança máxima:** A porta 8096 do Rathole não é exposta na internet da VPS; apenas o Nginx conversa com ela via rede Docker interna.
-* **Certificados SSL puros:** Gerenciados e renovados automaticamente pelo Certbot oficial via webroot.
-* **Consumo ultraleve:** Nginx + Certbot + Rathole consomem menos de 60 MB de RAM na VPS da Oracle.
+* **Segurança máxima:** A porta 8096 do Rathole não é exposta na internet da VPS; apenas o Nginx conversa com ela via rede interna do gateway.
+* **Podman Rootless com `pasta`:** Containers rodam sem privilégios de `root`, preservando o IP de origem dos visitantes sem SNAT artificial (essencial para o CrowdSec).
+* **Protocolo Noise no Rathole:** Criptografia ponta a ponta com curvas elípticas (Curve25519) e ChaCha20-Poly1305.
+* **WireGuard Nativo no Host:** VPN roda no kernel do host (`wg-quick@wg0`), evitando overhead de userspace e mantendo total compatibilidade com `iptables MASQUERADE` na interface `enp0s6`.
 
 ---
 
@@ -37,13 +40,16 @@ Stack padronizada em Docker Compose para atuar como gateway de entrada público 
 
 ```text
 oracle-gateway/
-├── docker-compose.yaml     # Orquestração dos 3 containers (Nginx, Certbot, Rathole)
-├── server.toml             # Configuração dos serviços e portas do Rathole Server
+├── Containerfile.rathole   # Build multi-arch (ARM64/x86_64) oficial do Rathole
+├── docker-compose.yaml     # Orquestração da stack Podman Rootless (Rathole, Nginx, Certbot, CrowdSec)
+├── server.toml             # Configuração sensível do Rathole Server (ignorado no Git)
+├── server.toml.example     # Modelo de configuração com protocolo Noise
 ├── nginx/
-│   └── default.conf        # Configuração do proxy reverso, headers e SSL
+│   └── default.conf        # Proxy reverso, headers de segurança e SSL
 ├── certbot/
-│   ├── conf/               # Certificados e chaves geradas pelo Let's Encrypt
-│   └── www/                # Desafio ACME HTTP-01 para renovação automática
+│   ├── conf/               # Certificados Let's Encrypt gerados
+│   └── www/                # Webroot para validação de desafio ACME HTTP-01
+├── crowdsec/               # Configuração e banco de dados do CrowdSec
 └── README.md               # Este guia passo a passo
 ```
 
@@ -58,39 +64,38 @@ oracle-gateway/
    * Adicione em **Ingress Rules**:
      * **Source CIDR:** `0.0.0.0/0` | **Protocol:** `TCP` | **Ports:** `80, 443, 2333`
 
-2. **No terminal SSH da VPS:**
+2. **No terminal SSH da VPS (Inserir no topo do INPUT para evitar REJECT pré-existente):**
    ```bash
-   sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 80 -j ACCEPT
-   sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 443 -j ACCEPT
-   sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 2333 -j ACCEPT
-   sudo netfilter-persistent save 2>/dev/null || sudo apt install iptables-persistent -y
+   sudo iptables -I INPUT 1 -p tcp -m multiport --dports 80,443,2333 -j ACCEPT
+   sudo iptables -I INPUT 1 -p udp --dport 51820 -j ACCEPT
+   sudo netfilter-persistent save
    ```
 
 ---
 
-### Passo 2: Copiar os arquivos para a VPS
+### Passo 2: Copiar ou Atualizar os arquivos na VPS
 
-No terminal da VPS (ou via `rsync`/`scp` a partir da sua máquina):
+No terminal da VPS (ou via git pull no repositório):
 
 ```bash
-mkdir -p ~/services/oracle-gateway
+cd ~/services/oracle-gateway
+git pull
 ```
-Copie a pasta `oracle-gateway` para a sua VPS em `~/services/oracle-gateway`.
 
 ---
 
-### Passo 3: Emitir o Primeiro Certificado SSL
+### Passo 3: Emitir o Primeiro Certificado SSL com Podman
 
-O Nginx precisa que o arquivo de certificado já exista para iniciar. Execute este comando único para obter o certificado inicial via Certbot standalone:
+O Nginx precisa que o arquivo de certificado já exista para iniciar. Execute este comando único para obter o certificado inicial via Certbot standalone com Podman rootless:
 
 *(Certifique-se de que nada esteja usando a porta 80 na VPS antes de rodar)*:
 
 ```bash
 cd ~/services/oracle-gateway
 
-docker run -it --rm \
+podman run -it --rm \
   -p 80:80 \
-  -v $(pwd)/certbot/conf:/etc/letsencrypt \
+  -v $(pwd)/certbot/conf:/etc/letsencrypt:Z \
   certbot/certbot certonly --standalone \
   -d jucalab.duckdns.org \
   --register-unsafely-without-email --agree-tos
@@ -102,23 +107,24 @@ docker run -it --rm \
 
 ---
 
-### Passo 4: Subir a Stack Completa
+### Passo 4: Subir a Stack Completa no Podman Rootless
 
-Com o certificado emitido, inicie todos os serviços:
+Com o certificado emitido e o `server.toml` configurado, inicie os serviços:
 
 ```bash
-docker compose up -d
+podman-compose up -d
 ```
 
 Verifique se todos os containers subiram:
 
 ```bash
-docker compose ps
+podman ps
 ```
 Todos devem estar com status **Up**:
 * `rathole-server` (escutando na porta 2333)
 * `nginx-proxy` (escutando nas portas 80 e 443)
 * `certbot-renew` (em loop de verificação para renovação a cada 12 horas)
+* `crowdsec` (monitorando os logs do Nginx)
 
 ---
 
