@@ -8,3 +8,17 @@ oracle-gateway/certbot/conf/*
 !oracle-gateway/certbot/conf/.gitkeep
 oracle-gateway/certbot/www/*
 !oracle-gateway/certbot/www/.gitkeep
+
+# Environment files
+**/.env
+
+# Oracle Gateway Secrets and Runtime Data
+oracle-gateway/server.toml
+oracle-gateway/wireguard/
+oracle-gateway/certbot/conf/
+oracle-gateway/crowdsec/
+oracle-gateway/nginx/logs/
+
+# Rathole Tunnel Secrets
+rathole/client/client.toml
+rathole/server/server.toml

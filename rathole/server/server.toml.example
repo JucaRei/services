@@ -1,0 +1,17 @@
+# ==============================================================================
+# Rathole Server Configuration (Exemplo Standalone)
+# ==============================================================================
+
+[server]
+bind_addr = "0.0.0.0:2333"
+default_token = "<GERAR_TOKEN_64_HEX>"
+
+[server.transport]
+type = "noise"
+
+[server.transport.noise]
+local_private_key = "<CHAVE_PRIVADA_NOISE_SERVIDOR>"
+
+[server.services.jellyfin]
+type = "tcp"
+bind_addr = "127.0.0.1:8096"

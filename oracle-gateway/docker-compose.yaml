@@ -1,5 +1,5 @@
 # ==============================================================================
-# Oracle Cloud Gateway: Rathole Server + Nginx Reverse Proxy + Certbot SSL
+# Oracle Cloud Gateway: Rathole Server + Nginx + Certbot + WireGuard + CrowdSec
 # Homelab Services: Entrada Pública Segura via OCI Always Free
 # ==============================================================================
 
@@ -31,6 +31,7 @@ services:
       - "443:443" # HTTPS (SSL seguro Let's Encrypt)
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/logs:/var/log/nginx
       - ./certbot/conf:/etc/letsencrypt:ro
       - ./certbot/www:/var/www/certbot:ro
     networks:
@@ -54,7 +55,56 @@ services:
     networks:
       - gateway-net
 
+  # Servidor VPN WireGuard com Painel Web (wg-easy)
+  wg-easy:
+    image: ghcr.io/wg-easy/wg-easy:latest
+    container_name: wg-easy
+    restart: unless-stopped
+    environment:
+      - WG_HOST=jucalab.duckdns.org
+      - WG_PORT=51820
+      - WG_DEFAULT_ADDRESS=10.66.66.x
+      - WG_DEFAULT_DNS=1.1.1.1
+      - WG_ALLOWED_IPS=0.0.0.0/0
+      - PASSWORD_HASH=${WG_PASSWORD_HASH}
+    volumes:
+      - ./wireguard:/etc/wireguard
+    ports:
+      - "51820:51820/udp"
+      - "127.0.0.1:51821:51821/tcp" # Painel restrito ao localhost / túnel SSH
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+    networks:
+      - gateway-net
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+
+  # Sistema de Detecção e Prevenção de Intrusão (CrowdSec)
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    container_name: crowdsec
+    restart: unless-stopped
+    environment:
+      - COLLECTIONS=crowdsecurity/nginx crowdsecurity/http-cve crowdsecurity/whitelist-good-actors
+    volumes:
+      - ./crowdsec/config:/etc/crowdsec
+      - ./crowdsec/data:/var/lib/crowdsec/data
+      - ./nginx/logs:/var/log/nginx:ro
+    networks:
+      - gateway-net
+    depends_on:
+      - nginx
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+
 networks:
   gateway-net:
     driver: bridge
-

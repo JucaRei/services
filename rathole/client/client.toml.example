@@ -1,0 +1,29 @@
+# ==============================================================================
+# Rathole Client Configuration (Homelab - NanoPi R3S / Host Local)
+# ==============================================================================
+
+[client]
+# Endereço público e porta de controle da VPS Oracle
+remote_addr = "jucalab.duckdns.org:2333"
+
+# Token compartilhado de autenticação (deve coincidir exatamente com o server.toml)
+default_token = "<GERAR_TOKEN_64_HEX>"
+
+# ------------------------------------------------------------------------------
+# Criptografia de Transporte (Noise Protocol)
+# ------------------------------------------------------------------------------
+[client.transport]
+type = "noise"
+
+[client.transport.noise]
+# Chave pública Noise do servidor (par da local_private_key do server.toml)
+remote_public_key = "<CHAVE_PUBLICA_NOISE_SERVIDOR>"
+
+# ------------------------------------------------------------------------------
+# Serviços Locais Expostos
+# ------------------------------------------------------------------------------
+
+# 1. Jellyfin (Servidor de Mídia no Homelab)
+[client.services.jellyfin]
+type = "tcp"
+local_addr = "10.10.10.139:3545"
