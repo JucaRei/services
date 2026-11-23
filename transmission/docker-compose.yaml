@@ -8,8 +8,8 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=America/Sao_Paulo
-      - USER=juca
-      - PASS=200291
+      - USER=${USER:-juca}
+      - PASS=${PASS}
       # - TRANSMISSION_WEB_HOME= #optional
       # - WHITELIST= #optional
       # - PEERPORT= #optional

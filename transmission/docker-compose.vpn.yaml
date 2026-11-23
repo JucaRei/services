@@ -1,0 +1,33 @@
+services:
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - 7777:9091 # Web UI Transmission
+      - 51413:51413 # Peer port TCP
+      - 51413:51413/udp # Peer port UDP
+      - 8888:8888 # HTTP Proxy para pyLoad e rede local
+    environment:
+      - VPN_SERVICE_PROVIDER=custom
+      - VPN_TYPE=wireguard
+      - WIREGUARD_ENDPOINT_IP=155.181.176.184
+      - WIREGUARD_ENDPOINT_PORT=51820
+      - WIREGUARD_PUBLIC_KEY=${WIREGUARD_SERVER_PUBLIC_KEY}
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=10.66.66.2/32
+      - FIREWALL_OUTBOUND_SUBNETS=10.10.10.0/24
+      - DNS_ADDRESS=10.10.10.25
+      - HTTPPROXY=on
+      - HTTPPROXY_LISTENING_ADDRESS=:8888
+    restart: unless-stopped
+
+  transmission:
+    network_mode: "service:gluetun"
+    ports: !reset []
+    depends_on:
+      gluetun:
+        condition: service_healthy
