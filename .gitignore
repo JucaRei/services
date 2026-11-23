@@ -8,6 +8,7 @@ oracle-gateway/certbot/conf/*
 !oracle-gateway/certbot/conf/.gitkeep
 oracle-gateway/certbot/www/*
 !oracle-gateway/certbot/www/.gitkeep
+oracle-gateway/certbot/duckdns.ini
 
 # Environment files
 **/.env

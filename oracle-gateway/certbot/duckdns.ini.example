@@ -1,0 +1,5 @@
+# ==============================================================================
+# Token de Autenticação da API DuckDNS para o Certbot (Desafio DNS-01)
+# ==============================================================================
+# Obtenha seu token na sua conta em: https://www.duckdns.org
+dns_duckdns_token = <SEU_TOKEN_DUCKDNS>

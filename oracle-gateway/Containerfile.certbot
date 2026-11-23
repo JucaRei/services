@@ -1,0 +1,7 @@
+# ==============================================================================
+# Certbot com plugin DuckDNS (Desafio DNS-01 para Certificado Wildcard)
+# ==============================================================================
+FROM docker.io/certbot/certbot:latest
+
+# Instala o plugin oficial certbot-dns-duckdns via pip
+RUN pip install --no-cache-dir certbot-dns-duckdns
