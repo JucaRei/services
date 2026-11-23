@@ -1,6 +1,9 @@
 services:
   rathole-client:
-    image: rapiz1/rathole:latest
+    image: localhost/rathole:local
+    build:
+      context: .
+      dockerfile: Containerfile.rathole
     container_name: rathole-client
     restart: unless-stopped
     # Roda o binário em modo cliente apontando para a config
