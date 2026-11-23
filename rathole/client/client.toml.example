@@ -27,3 +27,8 @@ remote_public_key = "<CHAVE_PUBLICA_NOISE_SERVIDOR>"
 [client.services.jellyfin]
 type = "tcp"
 local_addr = "10.10.10.139:3545"
+
+# 2. Transmission (Cliente Torrent no Download Node)
+[client.services.transmission]
+type = "tcp"
+local_addr = "10.10.10.140:7777"

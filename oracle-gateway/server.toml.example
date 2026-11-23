@@ -15,3 +15,7 @@ local_private_key = "<NOISE_PRIVATE_KEY>"
 [server.services.jellyfin]
 type = "tcp"
 bind_addr = "0.0.0.0:8096"
+
+[server.services.transmission]
+type = "tcp"
+bind_addr = "0.0.0.0:9091"
