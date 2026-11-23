@@ -69,6 +69,8 @@ services:
     restart: unless-stopped
     environment:
       - COLLECTIONS=crowdsecurity/nginx crowdsecurity/http-cve crowdsecurity/whitelist-good-actors
+    ports:
+      - "127.0.0.1:8080:8080" # Local API (LAPI) acessível apenas pelo bouncer do host
     volumes:
       - ./crowdsec/config:/etc/crowdsec
       - ./crowdsec/data:/var/lib/crowdsec/data
