@@ -59,6 +59,21 @@ O Beszel funciona com a arquitetura **Hub + Agent**. O Hub apenas centraliza os 
 * *Métricas coletadas:* Temperatura do SoC MediaTek Filogic e dos rádios Wi-Fi (MT7915 2.4G/5G), tráfego das interfaces Mesh/AP (`phy1-mesh0`, `phy1-ap0`), CPU dual-core e RAM (240MB).
 * *Otimização de Flash:* O executável do agente roda 100% em RAM (`/tmp/beszel-agent`) sem ocupar os 3.4 MB da partição `/overlay` da flash ROM. A inicialização é gerenciada pelo `/etc/init.d/beszel-agent` via procd.
 
+### Sistema 4: LXC VPN Gateway (Alpine Linux)
+* **Name:** `LXC VPN Gateway`
+* **Host / IP:** `10.10.10.23`
+* **Port:** `45876`
+* *Métricas coletadas:* CPU, uso de RAM, tráfego das interfaces `wg0` (túnel VPN) e `eth0` (LAN).
+* *Serviço nativo:* `/etc/init.d/beszel-agent` (OpenRC) autenticado com a chave do Hub.
+
+### Sistema 5: OCI Gateway (VPS Oracle Cloud)
+* **Name:** `OCI Gateway oraserver`
+* **Host / IP:** `10.66.66.1`
+* **Port:** `45876`
+* *Métricas coletadas:* CPU ARM64, uso de RAM, tráfego da VPS e da interface `wg0`.
+* *Segurança:* Coleta realizada 100% via túnel privado WireGuard (`10.66.66.1`) roteado pelo LXC VPN (`10.10.10.23`). Porta `45876/tcp` bloqueada na WAN pública da OCI via `iptables`.
+* *Serviço nativo:* `beszel-agent.service` (systemd).
+
 Após salvar, clique no **ícone de cubo** (Systems) no topo para ver os gráficos ao vivo!
 
 ---
