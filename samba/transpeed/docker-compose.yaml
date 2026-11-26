@@ -1,0 +1,12 @@
+services:
+  samba:
+    image: docker.io/dockurr/samba:latest
+    container_name: samba
+    restart: unless-stopped
+    ports:
+      - "445:445"
+      - "139:139"
+    volumes:
+      - /mnt/hd1:/storage/hd1
+      - /mnt/hd2:/storage/hd2
+      - /opt/stacks/samba/smb.conf:/etc/samba/smb.conf:ro

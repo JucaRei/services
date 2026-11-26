@@ -67,15 +67,15 @@ services:
           map to guest = Bad User
           force user = root
 
-      SAMBA_VOLUME_CONFIG_700gb: |
-        [700gb]
-          path = /700gb
-          dos filetimes = yes
-          guest ok = yes
-          read only = no
-          browseable = yes
-          map to guest = Bad User
-          force user = root
+      # SAMBA_VOLUME_CONFIG_700gb: |
+        # [700gb]
+          # path = /700gb
+          # dos filetimes = yes
+          # guest ok = yes
+          # read only = no
+          # browseable = yes
+          # map to guest = Bad User
+          # force user = root
 
       #SAMBA_VOLUME_CONFIG_hd400g: |
       #  [hd400g]
@@ -115,7 +115,7 @@ services:
 
     volumes:
       - /etc/avahi/services/:/external/avahi
-      - /mnt/500gb:/500gb
+      # - /mnt/500gb:/500gb
       - /mnt/700gb:/700gb
         #- /mnt/hd400g:/hd400g
       - /mnt/orico:/orico
