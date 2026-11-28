@@ -19,17 +19,17 @@ services:
       - ./data:/config
 
       ### Transpeed HD1
-      - /mnt/hd1/Courses:/cursos4
-      - /mnt/hd1/Downloads:/downloads4
-      - /mnt/hd1/Movies:/filmes4
-      - /mnt/hd1/Music:/musicas
-      - /mnt/hd1/TvShows:/series4
+      - /mnt/transpeed1/Courses:/cursos4
+      - /mnt/transpeed1/Downloads:/downloads4
+      - /mnt/transpeed1/Movies:/filmes4
+      - /mnt/transpeed1/Music:/musicas
+      - /mnt/transpeed1/TvShows:/series4
 
       ### Transpeed HD2
-      - /mnt/hd2/Downloads:/downloads5
-      - /mnt/hd2/Filmes:/filmes5
-      - /mnt/hd2/Series:/series5
-      - /mnt/hd2/Animes:/animes5
+      - /mnt/transpeed2/Downloads:/downloads5
+      - /mnt/transpeed2/Filmes:/filmes5
+      - /mnt/transpeed2/Series:/series5
+      - /mnt/transpeed2/Animes:/animes5
 
       ### Orico samba from soyoz
       - /mnt/orico/Animes:/animes3
