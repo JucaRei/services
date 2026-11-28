@@ -20,9 +20,19 @@ services:
       - ./config:/config
 
       ### HD 500gb
-      - /mnt/500gb/Media/Animes:/animes4:ro
-      - /mnt/500gb/Media/Movies:/filmes4:ro
-      - /mnt/500gb/Media/TvShows:/series4:ro
+      # - /mnt/500gb/Media/Animes:/animes4:ro
+      # - /mnt/500gb/Media/Movies:/filmes4:ro
+      # - /mnt/500gb/Media/TvShows:/series4:ro
+
+      ### Transpeed HD1
+      - /mnt/transpeed1/Movies:/filmes4:ro
+      - /mnt/transpeed1/Animes:/animes4:ro
+      - /mnt/transpeed1/Series:/series4:ro
+
+      ### Transpeed HD2
+      - /mnt/transpeed2/Movies:/filmes5:ro
+      - /mnt/transpeed2/Animes:/animes5:ro
+      - /mnt/transpeed2/Series:/series5:ro
 
       ### Orico samba from soyoz
       - /mnt/orico/Animes:/animes3:ro
